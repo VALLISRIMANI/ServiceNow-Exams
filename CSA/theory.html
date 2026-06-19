@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSA Theory Guide | ServiceNow CSA Study Portal</title>
+<style>
+:root{
+  --bg:#FFFFFF; --bg-secondary:#F5F5F5; --card:#FFFFFF; --text:#1F2937; --text-muted:#6B7280;
+  --accent:#2C5282; --accent-soft:#EBF2FA; --border:#E5E7EB; --success:#2F855A; --danger:#C53030; --warning:#9C6F19;
+  --shadow:0 1px 3px rgba(0,0,0,0.06); --shadow-hover:0 4px 12px rgba(0,0,0,0.08);
+  --radius:10px; --sidebar-w:268px;
+}
+[data-theme="dark"]{
+  --bg:#0F1419; --bg-secondary:#161D26; --card:#1B232D; --text:#E5E9EE; --text-muted:#8B97A5;
+  --accent:#6FA8DC; --accent-soft:#1B2C3D; --border:#2B3641; --success:#48BB78; --danger:#F56565; --warning:#ECC94B;
+  --shadow:0 1px 3px rgba(0,0,0,0.3); --shadow-hover:0 4px 16px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.65; font-size:16px; transition:background .2s,color .2s;
+}
+h1,h2,h3,h4{font-family:Georgia,'Times New Roman',serif; font-weight:600; color:var(--text); line-height:1.3;}
+a{color:var(--accent); text-decoration:none;}
+a:hover{text-decoration:underline;}
+::selection{background:var(--accent-soft);}
+
+/* Layout */
+.app{display:flex; min-height:100vh;}
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; background:var(--bg-secondary); border-right:1px solid var(--border);
+  position:fixed; top:0; left:0; height:100vh; overflow-y:auto; padding:20px 0 40px; z-index:100;
+  transition:transform .25s ease;
+}
+.sidebar-brand{padding:0 20px 16px; border-bottom:1px solid var(--border); margin-bottom:14px;}
+.sidebar-brand .logo-row{display:flex; align-items:center; gap:10px;}
+.sidebar-brand .badge{width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Georgia,serif;font-size:15px;flex-shrink:0;}
+.sidebar-brand h1{font-size:16px; margin:0; line-height:1.25;}
+.sidebar-brand p{font-size:12px; color:var(--text-muted); margin:2px 0 0;}
+.nav-group{margin-bottom:6px;}
+.nav-group-label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:14px 20px 6px; font-weight:600;}
+.nav-link{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 20px; font-size:14px;
+  color:var(--text); border-left:3px solid transparent; cursor:pointer;
+}
+.nav-link:hover{background:var(--accent-soft); text-decoration:none;}
+.nav-link.active{border-left-color:var(--accent); background:var(--accent-soft); font-weight:600; color:var(--accent);}
+.nav-link .check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;}
+.nav-link .check.done{background:var(--success);border-color:var(--success);}
+.module-sub-list{display:none; flex-direction:column;}
+.module-sub-list.open{display:flex;}
+.module-sub-list a{padding:6px 20px 6px 40px; font-size:12.5px; color:var(--text-muted); display:block;}
+.module-sub-list a:hover{color:var(--accent);}
+
+.main{margin-left:var(--sidebar-w); flex:1; min-width:0;}
+.topbar{
+  position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; padding:12px 28px;
+}
+.search-wrap{flex:1; max-width:480px; position:relative;}
+.search-wrap input{
+  width:100%; padding:9px 14px 9px 34px; border-radius:8px; border:1px solid var(--border); background:var(--bg-secondary);
+  color:var(--text); font-size:14px;
+}
+.search-wrap input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.search-icon{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;}
+.search-results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; box-shadow:var(--shadow-hover); max-height:360px; overflow-y:auto; display:none; z-index:60;
+}
+.search-results.open{display:block;}
+.search-result-item{padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px;}
+.search-result-item:last-child{border-bottom:none;}
+.search-result-item:hover{background:var(--accent-soft);}
+.search-result-item .srt{font-weight:600; display:block; margin-bottom:2px;}
+.search-result-item .srm{color:var(--text-muted); display:block;}
+.topbar-right{display:flex; align-items:center; gap:10px; margin-left:auto;}
+.icon-btn{
+  width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+}
+.icon-btn:hover{background:var(--accent-soft);}
+.menu-toggle{display:none;}
+.progress-pill{
+  font-size:12.5px; padding:7px 12px; border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; white-space:nowrap;
+}
+
+.content{padding:32px 40px 80px; max-width:980px;}
+.page-header{margin-bottom:8px;}
+.page-header .eyebrow{font-size:12.5px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+.page-header h1{font-size:30px; margin:0 0 6px;}
+.page-header .sub{color:var(--text-muted); font-size:15px; max-width:680px;}
+
+.module{margin-top:56px; padding-top:8px; border-top:1px solid var(--border);}
+.module:first-of-type{border-top:none; margin-top:36px;}
+.module-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+.module-num{font-family:Georgia,serif; font-size:14px; color:var(--accent); font-weight:700;}
+.module h2{font-size:23px; margin:0;}
+.mark-done-btn{
+  margin-left:auto; font-size:12px; padding:6px 12px; border-radius:7px; border:1px solid var(--border); background:var(--card);
+  color:var(--text-muted); cursor:pointer; font-weight:600;
+}
+.mark-done-btn.done{background:var(--success); color:#fff; border-color:var(--success);}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin:18px 0; box-shadow:var(--shadow);}
+.card h3{font-size:17px; margin:0 0 10px;}
+.card h4{font-size:14.5px; margin:16px 0 6px;}
+.card p{margin:8px 0;}
+.card ul, .card ol{margin:8px 0; padding-left:22px;}
+.card li{margin:4px 0;}
+
+.example-box{
+  background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+.example-box strong{color:var(--accent);}
+.trick-box{
+  background:rgba(236,201,75,0.08); border-left:3px solid var(--warning); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .trick-box{background:rgba(236,201,75,0.06);}
+.trick-box strong{color:var(--warning);}
+.mistake-box{
+  background:rgba(197,48,48,0.06); border-left:3px solid var(--danger); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .mistake-box{background:rgba(245,101,101,0.06);}
+.mistake-box strong{color:var(--danger);}
+
+table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border);}
+th{background:var(--bg-secondary); font-weight:700; color:var(--text);}
+tr:hover{background:var(--bg-secondary);}
+
+.diagram{
+  background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:22px;
+  margin:16px 0; font-family:'SF Mono',Consolas,monospace; font-size:13px; overflow-x:auto;
+}
+.diagram pre{margin:0; white-space:pre;}
+.flow-svg{display:block; margin:16px auto; max-width:100%;}
+
+.tag{display:inline-block; font-size:11px; padding:3px 9px; border-radius:12px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin:2px 4px 2px 0;}
+
+.collapsible{border:1px solid var(--border); border-radius:8px; margin:12px 0; overflow:hidden;}
+.collapsible-head{
+  display:flex; justify-content:space-between; align-items:center; padding:12px 16px; cursor:pointer; background:var(--card); font-weight:600; font-size:14.5px;
+}
+.collapsible-head:hover{background:var(--bg-secondary);}
+.collapsible-head .arrow{transition:transform .2s; color:var(--text-muted); font-size:12px;}
+.collapsible.open .collapsible-head .arrow{transform:rotate(90deg);}
+.collapsible-body{display:none; padding:0 16px 16px; font-size:14.5px;}
+.collapsible.open .collapsible-body{display:block;}
+
+.exam-q{background:var(--bg-secondary); border-radius:8px; padding:14px 16px; margin:12px 0; font-size:14px;}
+.exam-q .q-label{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;}
+.exam-q .q-answer{margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); color:var(--text-muted); font-size:13.5px;}
+
+.concept-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0;}
+@media (max-width:700px){.concept-grid{grid-template-columns:1fr;}}
+.concept-card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.concept-card .cnum{font-size:11px; color:var(--accent); font-weight:700;}
+.concept-card h4{margin:4px 0 8px; font-size:15px;}
+.concept-card .clabel{font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-top:8px;}
+.concept-card .ctext{font-size:13.5px; margin:2px 0 0;}
+
+.bottom-nav{display:flex; justify-content:space-between; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); gap:12px;}
+.bottom-nav a{
+  flex:1; padding:14px 18px; border:1px solid var(--border); border-radius:8px; font-size:14px; color:var(--text);
+  display:flex; flex-direction:column; gap:2px;
+}
+.bottom-nav a:hover{background:var(--accent-soft); text-decoration:none;}
+.bottom-nav .lbl{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;}
+.bottom-nav .next-link{text-align:right;}
+
+@media (max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0); box-shadow:4px 0 20px rgba(0,0,0,0.2);}
+  .main{margin-left:0;}
+  .menu-toggle{display:flex;}
+  .content{padding:24px 18px 60px;}
+  .concept-grid{grid-template-columns:1fr;}
+  .search-wrap{max-width:none;}
+  .progress-pill{display:none;}
+}
+.overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90;}
+.overlay.open{display:block;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-row">
+      <div class="badge">SN</div>
+      <div>
+        <h1>CSA Study Portal</h1>
+        <p>Certified System Administrator</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-group">
+    <a class="nav-link" href="index.html"><span>Dashboard</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Theory — 16 Modules</div>
+    <div id="module-nav-list"></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Practice</div>
+    <a class="nav-link" href="flashcards.html"><span>Flashcards (150)</span></a>
+    <a class="nav-link" href="mocktest1.html"><span>Mock Test 1</span></a>
+    <a class="nav-link" href="mocktest2.html"><span>Mock Test 2</span></a>
+    <a class="nav-link" href="mocktest3.html"><span>Mock Test 3</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Revision</div>
+    <a class="nav-link" href="revision.html"><span>Rapid Revision & Exam Guide</span></a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search theory (e.g. ACL, Update Set, Flow Designer)..." autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div class="topbar-right">
+      <span class="progress-pill" id="progressPill">0 / 16 modules</span>
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="eyebrow">Complete Theory</div>
+      <h1>CSA Theory Guide</h1>
+      <p class="sub">All 16 theory modules — platform fundamentals through exam-critical concepts. Mark modules complete as you go; your progress is saved automatically on this device.</p>
+    </div>
+
+    <section class="module" id="module-1">
+      <div class="module-head">
+        <span class="module-num">MODULE 1</span>
+        <h2>Platform Overview</h2>
+        <button class="mark-done-btn" id="donebtn-1" onclick="toggleModuleDone(1)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>What is ServiceNow?</h3>
+        <p>ServiceNow is a cloud-based platform originally built for IT Service Management (ITSM), now extended into HR, Customer Service, Security Operations, and general business workflow automation. The key idea the exam tests: ServiceNow is <strong>one platform</strong> with many applications built on top of it, all sharing the same database, UI engine, and security model.</p>
+        <div class="example-box"><strong>Example:</strong> The same "Incident" record structure that IT uses to track a broken laptop can be adapted (via tables that extend the Task table) to track an HR case or a facilities request — because every application sits on the same underlying platform.</div>
+      </div>
+
+      <div class="card">
+        <h3>SaaS vs PaaS — and where ServiceNow fits</h3>
+        <table>
+          <tr><th>Model</th><th>What the vendor manages</th><th>What you manage</th><th>Example</th></tr>
+          <tr><td>IaaS</td><td>Hardware, networking, virtualization</td><td>OS, runtime, apps, data</td><td>AWS EC2</td></tr>
+          <tr><td>PaaS</td><td>Hardware + OS + runtime</td><td>Applications & data</td><td>ServiceNow Platform (build custom apps)</td></tr>
+          <tr><td>SaaS</td><td>Everything except your data/config</td><td>Configuration & data only</td><td>Using out-of-box Incident Management</td></tr>
+        </table>
+        <div class="trick-box"><strong>Exam Trick:</strong> ServiceNow is frequently described as <em>both</em> SaaS and PaaS depending on context — SaaS when you use out-of-box apps as-is, PaaS when you build custom applications on the platform. If a question asks "what type of cloud service model is ServiceNow," the safest exam answer is usually <strong>PaaS</strong> (because the platform itself is the product being tested), but read the question's framing carefully.</div>
+      </div>
+
+      <div class="card">
+        <h3>Cloud Concepts ServiceNow Relies On</h3>
+        <ul>
+          <li><strong>Multi-instance architecture:</strong> Each customer gets their own dedicated application instance and database — not a shared (multi-tenant) database. This is different from many other SaaS products.</li>
+          <li><strong>Multi-tenancy at the data center level:</strong> Customers share underlying hardware/data center resources, but never share a database with another customer.</li>
+          <li><strong>Automatic upgrades:</strong> ServiceNow pushes platform-wide upgrades (twice yearly, named releases e.g. Washington DC, Xanadu) to all instances.</li>
+        </ul>
+        <div class="example-box"><strong>Example:</strong> Company A and Company B are both ServiceNow customers. Even though their instances run on shared data center infrastructure, Company A can never query or see Company B's records — each has a logically and physically separate database.</div>
+      </div>
+
+      <div class="card">
+        <h3>ServiceNow Architecture (High Level)</h3>
+        <div class="diagram"><pre>
+   ┌─────────────────────────────────────────┐
+   │              Browser / Client             │
+   └───────────────────┬─────────────────────┘
+                        │ HTTPS
+   ┌───────────────────▼─────────────────────┐
+   │     Application Server (Tomcat-based)     │
+   │   - Glide engine, business rules, UI      │
+   └───────────────────┬─────────────────────┘
+                        │
+   ┌───────────────────▼─────────────────────┐
+   │          MySQL Database (per instance)    │
+   │     Tables, Records, Dictionary, ACLs      │
+   └─────────────────────────────────────────┘
+        </pre></div>
+        <p>Everything a user sees — forms, lists, reports — is generated dynamically by the Glide engine reading metadata (dictionary, ACLs, UI policies) stored in the same database as the actual data.</p>
+      </div>
+
+      <div class="card">
+        <h3>Instance Types</h3>
+        <table>
+          <tr><th>Instance</th><th>Purpose</th><th>Who uses it</th></tr>
+          <tr><td>Personal Developer Instance (PDI)</td><td>Free, individual learning/dev sandbox</td><td>Individual developers, students</td></tr>
+          <tr><td>Development</td><td>Build and unit-test new configuration/customization</td><td>Developers</td></tr>
+          <tr><td>Test (QA/UAT)</td><td>Validate changes before they reach real users</td><td>Testers, business users (UAT)</td></tr>
+          <tr><td>Production</td><td>Live instance used by actual end users daily</td><td>End users, agents, customers</td></tr>
+        </table>
+        <div class="example-box"><strong>Example:</strong> A developer builds a new approval workflow in <strong>Dev</strong>, it's validated in <strong>Test</strong> by the business team, and only after sign-off is it moved (via an Update Set) into <strong>Production</strong> where real incidents are processed.</div>
+        <div class="mistake-box"><strong>Common Mistake:</strong> Assuming you can build directly in Production. ServiceNow's best-practice instance strategy exists specifically to prevent untested changes from breaking the live system.</div>
+      </div>
+
+      <h3 style="margin-top:28px;">3 Worked Examples</h3>
+      <div class="exam-q">
+        <div class="q-label">Example 1</div>
+        A startup signs up for ServiceNow and only uses the out-of-box Incident Management app without any customization. Which model are they primarily consuming?
+        <div class="q-answer"><strong>Answer:</strong> SaaS — they're consuming a ready-made application without building anything new.</div>
+      </div>
+      <div class="exam-q">
+        <div class="q-label">Example 2</div>
+        A company builds a fully custom "Vehicle Fleet Management" application using ServiceNow Studio, custom tables, and workflows.
+        <div class="q-answer"><strong>Answer:</strong> PaaS — they are using the platform to build and run a brand-new application.</div>
+      </div>
+      <div class="exam-q">
+        <div class="q-label">Example 3</div>
+        Two unrelated companies both use ServiceNow. Can Company A's administrator ever browse Company B's incident records?
+        <div class="q-answer"><strong>Answer:</strong> No — multi-instance architecture means every customer has a logically separate database; there is no shared multi-tenant data layer between customers.</div>
+      </div>
+    </section>
+
+    <section class="module" id="module-2">
+      <div class="module-head">
+        <span class="module-num">MODULE 2</span>
+        <h2>User Interface</h2>
+        <button class="mark-done-btn" id="donebtn-2" onclick="toggleModuleDone(2)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Banner Frame</h3>
+        <p>The bar at the very top of every ServiceNow screen. It contains the company logo, global search, notification bell, the user's profile menu (where you can switch themes, view your profile, and log out), and — depending on configuration — a help icon.</p>
+      </div>
+
+      <div class="card">
+        <h3>Application Navigator</h3>
+        <p>The collapsible panel (usually on the left) listing every <strong>Application</strong> the logged-in user has access to, and the <strong>Modules</strong> (links) inside each application. Clicking a module opens a list or a specific page.</p>
+        <div class="diagram"><pre>
+Application Navigator
+├── Incident                  (Application)
+│   ├── Create New            (Module)
+│   ├── Open                  (Module)
+│   └── All                   (Module)
+├── Service Catalog
+│   ├── Catalog Definitions
+│   └── Maintain Items
+└── System Definition
+    ├── Tables
+    └── Dictionary
+        </pre></div>
+        <div class="example-box"><strong>Example:</strong> Clicking <em>Incident → Open</em> in the navigator runs a saved filter showing all incidents whose state is not "Closed" or "Resolved."</div>
+      </div>
+
+      <div class="card">
+        <h3>Favorites & History</h3>
+        <ul>
+          <li><strong>Favorites:</strong> User-curated bookmarks (modules, records, or reports) for quick access — organized into folders.</li>
+          <li><strong>History:</strong> An automatically maintained list of the most recently visited pages/records — the user doesn't add to this manually.</li>
+        </ul>
+        <div class="trick-box"><strong>Exam Trick:</strong> Remember — History is automatic, Favorites is manual. A question describing "the system automatically shows my last 10 visited records" is testing History, not Favorites.</div>
+      </div>
+
+      <div class="card">
+        <h3>Lists vs Forms</h3>
+        <table>
+          <tr><th></th><th>List</th><th>Form</th></tr>
+          <tr><td>Shows</td><td>Many records, one row each</td><td>One record, all its fields</td></tr>
+          <tr><td>Customizable via</td><td>Personalize List</td><td>Configure Form Layout</td></tr>
+          <tr><td>Typical use</td><td>Browsing/filtering/sorting records</td><td>Reading or editing one record in detail</td></tr>
+        </table>
+        <p>Clicking any row in a list opens that record's <strong>Form</strong> view.</p>
+      </div>
+
+      <div class="card">
+        <h3>Related Lists</h3>
+        <p>Lists shown at the bottom of a form displaying records from a <em>different</em> table that reference the current record. For example, an Incident form's "Affected CIs" related list shows Configuration Items linked to that incident, even though those CI records live in a different table.</p>
+      </div>
+
+      <div class="card">
+        <h3>Filter Navigator</h3>
+        <p>The search box at the top of the Application Navigator. Typing a module or application name filters the navigator in real time, letting admins jump straight to a module without manually expanding menus.</p>
+      </div>
+
+      <div class="card">
+        <h3>Typical UI Navigation Flow</h3>
+        <div class="diagram"><pre>
+Application Navigator
+      │  (click module e.g. "Incident > Open")
+      ▼
+   List View  ──────────────► Personalize List / Filter / Sort / Group By
+      │  (click a record row)
+      ▼
+   Form View  ──────────────► Related Lists, Related Links, UI Actions
+        </pre></div>
+      </div>
+
+      <h3 style="margin-top:28px;">Common CSA Questions</h3>
+      <div class="exam-q"><div class="q-label">Q</div>What is the difference between a Module and an Application in the navigator?
+        <div class="q-answer"><strong>A:</strong> An Application is the top-level grouping (e.g., "Incident"); Modules are the individual links inside it (e.g., "Create New," "Open," "All").</div></div>
+      <div class="exam-q"><div class="q-label">Q</div>Where would you go to see the 5 records you most recently opened?
+        <div class="q-answer"><strong>A:</strong> History — it's automatically tracked, unlike Favorites.</div></div>
+    </section>
+
+    <section class="module" id="module-3">
+      <div class="module-head">
+        <span class="module-num">MODULE 3</span>
+        <h2>Users, Groups and Roles</h2>
+        <button class="mark-done-btn" id="donebtn-3" onclick="toggleModuleDone(3)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Core Definitions</h3>
+        <ul>
+          <li><strong>User:</strong> A record in the <code>sys_user</code> table representing a person who can log in.</li>
+          <li><strong>Group:</strong> A collection of users (<code>sys_user_group</code>), often used for assignment (e.g., "Network Support") rather than direct permission grants.</li>
+          <li><strong>Role:</strong> A named permission grant (<code>sys_user_role</code>) that unlocks access to specific data/UI — e.g., <code>itil</code>, <code>admin</code>, <code>catalog_admin</code>.</li>
+          <li><strong>Role Inheritance:</strong> Roles can "contain" other roles. If Role A contains Role B, anyone with Role A automatically also has all permissions of Role B.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>User → Group → Role Mapping</h3>
+        <div class="diagram"><pre>
+   User: Priya
+      │  is a member of
+      ▼
+   Group: "Service Desk"
+      │  has roles assigned
+      ▼
+   Roles: itil, catalog_item_viewer
+      │  grant access to
+      ▼
+   ACLs check role → grant/deny read/write on tables & fields
+        </pre></div>
+        <p>Critically: a <strong>User does not need a role directly</strong> — they can inherit roles entirely through group membership. This is the most efficient and common way ServiceNow admins manage access at scale.</p>
+        <div class="example-box"><strong>Example:</strong> Instead of assigning the <code>itil</code> role to 200 individual support agents, an admin assigns the role once to the "Service Desk" group, then adds/removes agents from that group as staffing changes.</div>
+      </div>
+
+      <div class="card">
+        <h3>Role Inheritance Example</h3>
+        <table>
+          <tr><th>Role</th><th>Contains</th><th>Net effect for a user with this role</th></tr>
+          <tr><td>admin</td><td>(implicitly) every role</td><td>Full system access</td></tr>
+          <tr><td>itil</td><td>—</td><td>Can work with incidents, problems, changes</td></tr>
+          <tr><td>catalog_admin</td><td>catalog</td><td>Anyone with catalog_admin also gets everything the catalog role gives</td></tr>
+        </table>
+      </div>
+
+      <h3 style="margin-top:28px;">Scenario-Based Questions</h3>
+      <div class="exam-q">
+        <div class="q-label">Scenario</div>
+        John belongs to the "ITIL Users" group, which has the <code>itil</code> role assigned. John personally has no roles assigned on his user record. What access does John get?
+        <div class="q-answer"><strong>Answer:</strong> John gets full <code>itil</code> role access, because roles assigned to a group are inherited by every member of that group — a user's own record doesn't need the role directly.</div>
+      </div>
+      <div class="exam-q">
+        <div class="q-label">Scenario</div>
+        Priya is removed from the "Service Desk" group but keeps the <code>itil</code> role directly on her user record. Does she lose ITIL access?
+        <div class="q-answer"><strong>Answer:</strong> No — because the role is also assigned directly to her user record, removing her from the group does not remove a directly-assigned role.</div>
+      </div>
+      <div class="trick-box"><strong>Exam Trick:</strong> Watch for questions that test whether you know roles can come from <em>two sources simultaneously</em>: directly on the user, and via group membership. Removing one source doesn't remove the other.</div>
+    </section>
+
+    <section class="module" id="module-4">
+      <div class="module-head">
+        <span class="module-num">MODULE 4</span>
+        <h2>Tables and Databases</h2>
+        <button class="mark-done-btn" id="donebtn-4" onclick="toggleModuleDone(4)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Core Definitions</h3>
+        <ul>
+          <li><strong>Table:</strong> A structured collection of records, similar to a spreadsheet (e.g., the Incident table).</li>
+          <li><strong>Record:</strong> A single row in a table (one specific incident).</li>
+          <li><strong>Field:</strong> A column in a table (e.g., "Priority," "Short Description").</li>
+          <li><strong>Schema:</strong> The overall structure — which tables exist and how they relate.</li>
+          <li><strong>Dictionary (sys_dictionary):</strong> The metadata table that defines every field on every table — its type, label, length, mandatory status, and more.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Types of Tables</h3>
+        <table>
+          <tr><th>Type</th><th>Definition</th></tr>
+          <tr><td>Base Table</td><td>A standalone table not extended from anything (e.g., <code>sys_user</code>).</td></tr>
+          <tr><td>Parent Table</td><td>A table that other tables extend from (e.g., <code>Task</code> is parent to Incident).</td></tr>
+          <tr><td>Child / Extended Table</td><td>A table built on top of a parent, inheriting all its fields plus adding its own (e.g., Incident extends Task).</td></tr>
+        </table>
+        <div class="trick-box"><strong>Exam Trick:</strong> "Parent" and "Child" are relative terms — Incident is a child of Task, but could itself be a parent if something extended it. Don't memorize a table as permanently "parent" or "child"; it depends on the relationship being described.</div>
+      </div>
+
+      <div class="card">
+        <h3>The Task Table Hierarchy</h3>
+        <div class="diagram"><pre>
+                    Task (parent table)
+                      │
+        ┌─────────────┼──────────────┐
+        ▼             ▼              ▼
+    Incident       Problem      Change Request
+   (extends Task) (extends Task) (extends Task)
+        </pre></div>
+        <p>Because Incident, Problem, and Change Request all extend Task, they automatically inherit Task's common fields: <code>short_description</code>, <code>state</code>, <code>priority</code>, <code>assigned_to</code>, <code>assignment_group</code>, etc. Each child table then adds its own specific fields (e.g., Incident adds <code>caller_id</code>; Change Request adds <code>risk</code> and <code>type</code>).</p>
+        <div class="example-box"><strong>Example:</strong> A Business Rule written on the <strong>Task</strong> table (e.g., "auto-set urgency based on priority") runs on Incident, Problem, AND Change Request automatically — because they all inherit from Task. This is the single biggest reason ServiceNow uses table extension.</div>
+      </div>
+
+      <div class="card">
+        <h3>Common Exam Traps</h3>
+        <div class="mistake-box"><strong>Trap 1:</strong> Thinking each child table has a separate copy of the parent's fields. In reality, child table records are stored partly in the parent table and partly in the extension table (via underlying joins) — conceptually, think of it as "inherits," not "duplicates."</div>
+        <div class="mistake-box"><strong>Trap 2:</strong> Assuming you must redefine common fields like <code>priority</code> on every child table. You don't — define once on the parent (Task), and every extended table gets it for free.</div>
+        <div class="mistake-box"><strong>Trap 3:</strong> Confusing "Table" with "List view of a table." A list view is just a way of looking at table data; it isn't the table itself.</div>
+      </div>
+    </section>
+
+    <section class="module" id="module-5">
+      <div class="module-head">
+        <span class="module-num">MODULE 5</span>
+        <h2>Forms and Lists</h2>
+        <button class="mark-done-btn" id="donebtn-5" onclick="toggleModuleDone(5)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Configuring Form Layout</h3>
+        <p><strong>Configure Form Layout</strong> lets an admin (or user, if permitted) add/remove fields from a form, reorder them, and organize them into sections — without writing any code. Accessed via the gear icon on a form, or right-click → Configure → Form Layout.</p>
+        <ul>
+          <li><strong>Sections:</strong> Group related fields together (e.g., "Caller Information," "Notes") and can be made collapsible.</li>
+          <li><strong>Related Lists:</strong> Configured separately via "Related List" configuration — choosing which related tables show at the bottom of the form.</li>
+        </ul>
+        <div class="example-box"><strong>Example:</strong> On the Incident form, an admin uses Configure Form Layout to move the "Category" field next to "Subcategory" and add a new custom field "Customer Impact" into the main section.</div>
+      </div>
+
+      <div class="card">
+        <h3>Personalizing Lists</h3>
+        <p><strong>Personalize List</strong> (also via the gear icon, but on a list) lets a user choose which columns display and in what order — this is a <em>personal</em> preference, not a system-wide change (unless an admin uses "List Layout" administration instead).</p>
+        <table>
+          <tr><th>Action</th><th>What it does</th></tr>
+          <tr><td>Filter</td><td>Show only records matching conditions (e.g., Priority = 1 - Critical)</td></tr>
+          <tr><td>Sort</td><td>Order rows by a column, ascending or descending</td></tr>
+          <tr><td>Group By</td><td>Cluster rows under a shared field value (e.g., group incidents by Assignment Group)</td></tr>
+        </table>
+        <div class="trick-box"><strong>Exam Trick:</strong> "Personalize List" changes what <em>you</em> see; it does not change the form/list for other users. Confusing personal list changes with global list layout changes is a classic distractor in CSA questions.</div>
+      </div>
+
+      <div class="card">
+        <h3>Interactive Example — Incident Form</h3>
+        <div class="diagram"><pre>
+INCIDENT FORM
+┌─────────────────────────────────────────┐
+│ Number: INC0010023      State: New        │
+├─────────────────────────────────────────┤
+│ SECTION: Caller Information                │
+│   Caller: [_____________]                  │
+│   Contact type: [Phone ▼]                  │
+├─────────────────────────────────────────┤
+│ SECTION: Notes                             │
+│   Short description: [____________]        │
+│   Description (Journal): [____________]    │
+├─────────────────────────────────────────┤
+│ RELATED LIST: Affected CIs                 │
+│ RELATED LIST: Approvers                    │
+└─────────────────────────────────────────┘
+        </pre></div>
+      </div>
+    </section>
+
+    <section class="module" id="module-6">
+      <div class="module-head">
+        <span class="module-num">MODULE 6</span>
+        <h2>Dictionary and Fields</h2>
+        <button class="mark-done-btn" id="donebtn-6" onclick="toggleModuleDone(6)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>What is a Dictionary Entry?</h3>
+        <p>Every field on every table has a corresponding record in <code>sys_dictionary</code> defining its type, max length, label, default value, and whether it's mandatory, read-only, or unique. This is the metadata layer that drives how forms render fields automatically.</p>
+      </div>
+
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>String</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> Free-text field, single line, with a max character length.</p>
+          <p><strong>Example:</strong> "Short description" on Incident.</p>
+          <div class="diagram"><pre>Short description: [Email server is down____________]</pre></div>
+          <div class="exam-q"><div class="q-label">CSA Question</div>What happens if a user enters more characters than the String field's max length allows?
+            <div class="q-answer"><strong>A:</strong> The input is truncated to the field's defined maximum length.</div></div>
+        </div>
+      </div>
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>Integer</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> Whole numbers only, no decimals.</p>
+          <p><strong>Example:</strong> "Reassignment count" on Incident.</p>
+          <div class="exam-q"><div class="q-label">CSA Question</div>Can an Integer field store 4.5?
+            <div class="q-answer"><strong>A:</strong> No — Integer fields only store whole numbers; decimals require a Floating Point/Decimal field type.</div></div>
+        </div>
+      </div>
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>Choice</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> A dropdown of predefined values, each with a label and an underlying stored value.</p>
+          <p><strong>Example:</strong> "Priority" (1 - Critical, 2 - High, 3 - Moderate, 4 - Low, 5 - Planning).</p>
+          <div class="diagram"><pre>Priority: [1 - Critical ▼]</pre></div>
+          <div class="exam-q"><div class="q-label">CSA Question</div>Where are the available options for a Choice field defined?
+            <div class="q-answer"><strong>A:</strong> In Choice List records (<code>sys_choice</code>) tied to that field and table.</div></div>
+        </div>
+      </div>
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>Reference</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> Points to a record in another table — the most important field type for relationships in ServiceNow.</p>
+          <p><strong>Example:</strong> "Assigned to" on Incident references a record in <code>sys_user</code>.</p>
+          <div class="diagram"><pre>Assigned to: [🔍 Beth Anglin________]  ──► points to sys_user record</pre></div>
+          <div class="exam-q"><div class="q-label">CSA Question</div>What displays in a Reference field on the form — the sys_id or something else?
+            <div class="q-answer"><strong>A:</strong> The display value (e.g., user's name) is shown, even though internally the field stores the referenced record's sys_id.</div></div>
+        </div>
+      </div>
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>Boolean</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> True/False checkbox.</p>
+          <p><strong>Example:</strong> "Active" field on the User table.</p>
+          <div class="exam-q"><div class="q-label">CSA Question</div>What happens to a user record when "Active" is unchecked?
+            <div class="q-answer"><strong>A:</strong> The user can no longer log in, but the record and its history are preserved (not deleted).</div></div>
+        </div>
+      </div>
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>Date / Date Time</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> Date stores only a calendar date; Date/Time stores date plus time, automatically adjusted for the viewing user's time zone.</p>
+          <p><strong>Example:</strong> "Opened" (Date/Time) vs a custom "Target completion date" (Date only).</p>
+          <div class="trick-box"><strong>Exam Trick:</strong> Date/Time fields are stored in the database in UTC/GMT but <em>displayed</em> converted to each user's personal time zone setting — two users in different time zones see different displayed times for the same underlying record.</div>
+        </div>
+      </div>
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>HTML</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> Rich text field supporting formatting (bold, bullet points, images) — rendered as HTML.</p>
+          <p><strong>Example:</strong> Knowledge Article body field.</p>
+        </div>
+      </div>
+      <div class="collapsible" onclick="toggleCollapse(this)">
+        <div class="collapsible-head"><span>Journal</span><span class="arrow">›</span></div>
+        <div class="collapsible-body">
+          <p><strong>Definition:</strong> An append-only field — new entries are added with a timestamp and author, and previous entries are never overwritten.</p>
+          <p><strong>Example:</strong> "Additional comments" / "Work notes" on Incident.</p>
+          <div class="trick-box"><strong>Exam Trick:</strong> Unlike a String field, you cannot edit or delete a previous Journal entry — each entry is permanently logged, which is exactly why "Work notes" is used for audit trails.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="module" id="module-7">
+      <div class="module-head">
+        <span class="module-num">MODULE 7</span>
+        <h2>Service Catalog</h2>
+        <button class="mark-done-btn" id="donebtn-7" onclick="toggleModuleDone(7)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Core Definitions</h3>
+        <ul>
+          <li><strong>Catalog:</strong> The overall container (e.g., "Service Catalog," "HR Service Catalog").</li>
+          <li><strong>Category:</strong> A grouping within a catalog (e.g., "Hardware," "Software").</li>
+          <li><strong>Catalog Item:</strong> An individual requestable thing (e.g., "New Laptop").</li>
+          <li><strong>Record Producer:</strong> A catalog-style form that, on submit, creates a record directly in a target table (e.g., Incident) instead of a Request/RITM — useful for letting end users submit incidents through a friendlier catalog-style form.</li>
+          <li><strong>Order Guide:</strong> Bundles multiple catalog items together so a user can order a set in one request (e.g., "New Employee Onboarding" bundling a laptop + software + email account).</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Visual Hierarchy</h3>
+        <div class="diagram"><pre>
+Service Catalog
+   └── Category: Hardware
+          └── Category: Laptops
+                 ├── Item: "New Laptop Request"
+                 └── Item: "Laptop Repair"
+   └── Category: Access
+          └── Item: "Software Access Request"
+        </pre></div>
+      </div>
+
+      <div class="card">
+        <h3>What Happens When You Order an Item</h3>
+        <div class="diagram"><pre>
+User submits Catalog Item
+        │
+        ▼
+   Request (REQ) created
+        │
+        ▼
+   Requested Item (RITM) created — one per item ordered
+        │
+        ▼
+   Catalog Task(s) (SCTASK) created — fulfillment steps
+        </pre></div>
+        <div class="example-box"><strong>Example:</strong> Ordering "Laptop Request" creates one REQ, one RITM for the laptop, and SCTASKs like "Procure laptop" and "Image and ship laptop" assigned to fulfillment teams.</div>
+      </div>
+
+      <h3 style="margin-top:28px;">Scenario-Based Questions</h3>
+      <div class="exam-q"><div class="q-label">Scenario</div>A new employee needs a laptop, specific software, and system access all at once. What catalog feature lets them request all three in a single submission?
+        <div class="q-answer"><strong>A:</strong> An Order Guide — it bundles multiple catalog items into one guided request.</div></div>
+      <div class="exam-q"><div class="q-label">Scenario</div>The help desk wants end users to submit incidents through a simplified, catalog-style form rather than the standard Incident form. What should be used?
+        <div class="q-answer"><strong>A:</strong> A Record Producer — it creates a record directly in the Incident table from a catalog-style interface.</div></div>
+    </section>
+
+    <section class="module" id="module-8">
+      <div class="module-head">
+        <span class="module-num">MODULE 8</span>
+        <h2>Knowledge Management</h2>
+        <button class="mark-done-btn" id="donebtn-8" onclick="toggleModuleDone(8)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Core Concepts</h3>
+        <ul>
+          <li><strong>Knowledge Base (KB):</strong> A container for related articles (e.g., "IT Knowledge Base," "HR Policies").</li>
+          <li><strong>Knowledge Article:</strong> A single piece of documented content (a how-to, FAQ, or policy) stored in <code>kb_knowledge</code>.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Article Lifecycle</h3>
+        <div class="diagram"><pre>
+  Draft  ──►  Review  ──►  Published  ──►  Retired
+   (author        (approver        (visible to       (no longer
+   writes it)     checks it)        end users)         shown)
+        </pre></div>
+        <p>An article must go through an <strong>approval process</strong> before it's published — typically requiring a designated approver (often the KB's manager) to sign off. Once published, it can be retired (archived) when outdated, rather than deleted, to preserve audit history.</p>
+        <div class="example-box"><strong>Example:</strong> An agent drafts an article on "How to reset VPN password." It moves to Review where the IT manager approves it. Only after approval does it become visible in the self-service portal as Published.</div>
+      </div>
+
+      <h3 style="margin-top:28px;">Common Exam Questions</h3>
+      <div class="exam-q"><div class="q-label">Q</div>Can an end user see a Knowledge Article still in "Draft" state?
+        <div class="q-answer"><strong>A:</strong> No — only Published articles are visible to general end users; Draft is visible only to the author/contributors.</div></div>
+      <div class="exam-q"><div class="q-label">Q</div>What's the difference between deleting and retiring an article?
+        <div class="q-answer"><strong>A:</strong> Retiring hides the article from active search/browse while preserving its record and history; deleting permanently removes it.</div></div>
+    </section>
+
+    <section class="module" id="module-9">
+      <div class="module-head">
+        <span class="module-num">MODULE 9</span>
+        <h2>Flow Designer</h2>
+        <button class="mark-done-btn" id="donebtn-9" onclick="toggleModuleDone(9)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Core Concepts</h3>
+        <ul>
+          <li><strong>Flow Designer:</strong> A no-code/low-code visual tool for building process automation — the modern replacement for the legacy Workflow Editor.</li>
+          <li><strong>Trigger:</strong> The event that starts a flow — e.g., "Record Created," "Record Updated," "Scheduled," or "Service Catalog."</li>
+          <li><strong>Actions:</strong> The individual steps a flow performs — e.g., "Create Record," "Send Notification," "Update Record," "Ask for Approval."</li>
+          <li><strong>Subflow:</strong> A reusable mini-flow that can be called from multiple parent flows — useful for logic used in many places (e.g., "Send Standard Notification").</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Flow Diagram — When Incident Created</h3>
+        <div class="diagram"><pre>
+TRIGGER: Record Created (Table: Incident)
+        │
+        ▼
+ACTION: Assign Group  (set assignment_group based on category)
+        │
+        ▼
+ACTION: Send Notification (email assignment group)
+        │
+        ▼
+[Optional] SUBFLOW: "Escalate if Priority 1" (reusable logic)
+        </pre></div>
+        <div class="example-box"><strong>Example:</strong> A flow triggers whenever a new Incident is created with Category = "Network." It automatically assigns the "Network Support" group and emails them — no manual triage needed.</div>
+      </div>
+
+      <h3 style="margin-top:28px;">Exam-Oriented Scenarios</h3>
+      <div class="exam-q"><div class="q-label">Scenario</div>Three different flows all need to send the same "Approval Granted" email with identical logic. What Flow Designer feature avoids duplicating that logic three times?
+        <div class="q-answer"><strong>A:</strong> A Subflow — build the logic once, call it from all three flows.</div></div>
+      <div class="exam-q"><div class="q-label">Scenario</div>What determines when a flow begins running?
+        <div class="q-answer"><strong>A:</strong> Its Trigger — e.g., a record being created, updated, or a schedule being reached.</div></div>
+    </section>
+
+    <section class="module" id="module-10">
+      <div class="module-head">
+        <span class="module-num">MODULE 10</span>
+        <h2>Reporting</h2>
+        <button class="mark-done-btn" id="donebtn-10" onclick="toggleModuleDone(10)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Reports vs Dashboards</h3>
+        <ul>
+          <li><strong>Report:</strong> A single visualization of data from one (or a related) table — a chart, list, or pivot table.</li>
+          <li><strong>Dashboard:</strong> A collection of multiple reports/widgets arranged together for an at-a-glance view.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Chart Types</h3>
+        <table>
+          <tr><th>Type</th><th>Best for</th><th>Example</th></tr>
+          <tr><td>Pie</td><td>Proportions of a whole</td><td>Incidents by Priority</td></tr>
+          <tr><td>Bar</td><td>Comparing discrete categories</td><td>Incidents per Assignment Group</td></tr>
+          <tr><td>Line</td><td>Trends over time</td><td>Incidents created per week</td></tr>
+          <tr><td>Pivot</td><td>Cross-tabulating two dimensions</td><td>Incidents by Category AND Priority in one grid</td></tr>
+        </table>
+        <div class="example-box"><strong>Example:</strong> A manager wants to see how incident volume trended over the last 6 months — a Line chart is the right choice, not a Pie chart, because the goal is showing change over time.</div>
+      </div>
+    </section>
+
+    <section class="module" id="module-11">
+      <div class="module-head">
+        <span class="module-num">MODULE 11</span>
+        <h2>Importing Data</h2>
+        <button class="mark-done-btn" id="donebtn-11" onclick="toggleModuleDone(11)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Core Concepts</h3>
+        <ul>
+          <li><strong>Data Source:</strong> Defines where the import data comes from (a file upload, an FTP location, a JDBC connection, etc.).</li>
+          <li><strong>Import Set:</strong> A staging table where raw imported data first lands, exactly as it appeared in the source — unmodified.</li>
+          <li><strong>Transform Map:</strong> The rules that map fields from the Import Set staging table to fields on the real target table, with optional transformation logic.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Import Flow</h3>
+        <div class="diagram"><pre>
+   Excel / CSV File
+        │  (uploaded via Data Source)
+        ▼
+   Import Set Table   (raw staging data — unchanged)
+        │  (Transform Map applies field mapping + logic)
+        ▼
+   Target Table   (e.g., sys_user, cmdb_ci, custom table)
+        </pre></div>
+        <div class="trick-box"><strong>Exam Trick:</strong> The Import Set table is <em>never</em> the final destination — it's always a temporary staging area. If a question asks "where does data live after a successful import," the answer is the Target Table, not the Import Set.</div>
+      </div>
+
+      <div class="card">
+        <h3>Exam Tips</h3>
+        <ul>
+          <li>An import can be run manually or scheduled to run automatically on a recurring basis.</li>
+          <li>Transform Maps can include field mapping scripts to perform logic during the transform (e.g., looking up a reference field by name instead of sys_id).</li>
+          <li>You can re-run a Transform Map against the same Import Set data without re-importing the source file.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="module" id="module-12">
+      <div class="module-head">
+        <span class="module-num">MODULE 12</span>
+        <h2>Update Sets</h2>
+        <button class="mark-done-btn" id="donebtn-12" onclick="toggleModuleDone(12)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>What is an Update Set?</h3>
+        <p>An Update Set is a container that <strong>captures configuration changes</strong> (new fields, business rules, UI policies, ACLs, etc.) made in one instance so they can be moved to another instance — typically Dev → Test → Production. Update Sets move <em>configuration</em>, not transactional data (you wouldn't move actual Incident records this way).</p>
+      </div>
+
+      <div class="card">
+        <h3>Update Set Lifecycle</h3>
+        <div class="diagram"><pre>
+DEVELOPMENT INSTANCE
+   1. Set Current Update Set as the active "bucket"
+   2. Make configuration changes → automatically captured
+   3. Mark Update Set "Complete"
+        │
+        ▼  (Export XML, or use a remote update set connection)
+TARGET INSTANCE (e.g., Test/Production)
+   4. Retrieve / Import the Update Set
+   5. Preview  → checks for collisions with existing customizations
+   6. Commit   → applies the changes for real
+        │
+        ▼ (if something breaks)
+   7. Back Out → reverses the committed changes
+        </pre></div>
+      </div>
+
+      <div class="card">
+        <h3>Key Terms</h3>
+        <table>
+          <tr><th>Term</th><th>Meaning</th></tr>
+          <tr><td>Capture</td><td>Automatic — any config change made while an Update Set is "current" is recorded into it</td></tr>
+          <tr><td>Retrieve</td><td>Pulling the Update Set from its source instance into the target instance</td></tr>
+          <tr><td>Preview</td><td>A dry-run check that surfaces conflicts before committing — does NOT apply changes yet</td></tr>
+          <tr><td>Commit</td><td>Actually applies the captured changes to the target instance</td></tr>
+          <tr><td>Back Out</td><td>Reverses a previously committed Update Set</td></tr>
+        </table>
+        <div class="mistake-box"><strong>Common Exam Trap:</strong> Confusing Preview with Commit. Preview only <em>reports</em> potential conflicts — nothing is changed until you Commit. Many CSA questions test whether you know Preview is non-destructive.</div>
+        <div class="mistake-box"><strong>Common Exam Trap:</strong> Assuming Update Sets capture data records. They do not — Update Sets are for configuration/customization (metadata), never for moving regular business data like actual incidents or users.</div>
+      </div>
+
+      <h3 style="margin-top:28px;">Exam-Style Questions</h3>
+      <div class="exam-q"><div class="q-label">Q</div>A developer commits an Update Set to Production, but it breaks an existing business rule. What's the fastest way to undo this?
+        <div class="q-answer"><strong>A:</strong> Back Out the Update Set — it reverses the committed changes.</div></div>
+      <div class="exam-q"><div class="q-label">Q</div>Before committing an Update Set, what should always be done first?
+        <div class="q-answer"><strong>A:</strong> Preview it, to check for collisions with existing customizations in the target instance.</div></div>
+    </section>
+
+    <section class="module" id="module-13">
+      <div class="module-head">
+        <span class="module-num">MODULE 13</span>
+        <h2>Security (ACL)</h2>
+        <button class="mark-done-btn" id="donebtn-13" onclick="toggleModuleDone(13)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>What is an ACL?</h3>
+        <p>An Access Control List (ACL) is a rule that governs whether a user can perform a specific operation on a table, field, or other resource. Each ACL specifies: the resource it protects, the operation (CRUD), and the condition(s)/role(s) required to pass.</p>
+      </div>
+
+      <div class="card">
+        <h3>CRUD Operations</h3>
+        <table>
+          <tr><th>Letter</th><th>Operation</th><th>Example ACL</th></tr>
+          <tr><td>C</td><td>Create</td><td>Can this user create a new Incident record?</td></tr>
+          <tr><td>R</td><td>Read</td><td>Can this user view the "Salary" field on HR Case?</td></tr>
+          <tr><td>U</td><td>Update (Write)</td><td>Can this user edit the "Priority" field?</td></tr>
+          <tr><td>D</td><td>Delete</td><td>Can this user delete a Problem record?</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>How ACLs Evaluate</h3>
+        <div class="diagram"><pre>
+  User attempts an operation (e.g., Read field "salary")
+        │
+        ▼
+  ServiceNow checks ALL matching ACLs for that table/field/operation
+        │
+        ▼
+  Every matching ACL must pass (role match AND condition script true)
+        │
+        ▼
+  If ANY required ACL fails → operation is DENIED
+        </pre></div>
+        <div class="trick-box"><strong>Exam Trick:</strong> ACLs are evaluated with an AND logic across all matching rules — you must pass every applicable ACL, not just one. A common distractor implies "any matching ACL grants access," which is incorrect.</div>
+      </div>
+
+      <h3 style="margin-top:28px;">Read/Write Scenarios</h3>
+      <div class="exam-q"><div class="q-label">Scenario</div>An ACL on the Incident table's "Read" operation requires the <code>itil</code> role. A user without any roles tries to open an Incident list. What happens?
+        <div class="q-answer"><strong>A:</strong> They cannot read/see Incident records — the list will appear empty or access will be denied, since the Read ACL's role requirement isn't met.</div></div>
+      <div class="exam-q"><div class="q-label">Scenario</div>A field-level ACL restricts Write access on "Approval" to the <code>approver_user</code> role, while the table-level ACL only requires <code>itil</code>. A user has <code>itil</code> but not <code>approver_user</code>. Can they edit the Approval field?
+        <div class="q-answer"><strong>A:</strong> No — they pass the table-level ACL but fail the field-level ACL, and since all matching ACLs must pass, the field stays read-only for this user.</div></div>
+    </section>
+
+    <section class="module" id="module-14">
+      <div class="module-head">
+        <span class="module-num">MODULE 14</span>
+        <h2>Notifications</h2>
+        <button class="mark-done-btn" id="donebtn-14" onclick="toggleModuleDone(14)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <h3>Core Concepts</h3>
+        <ul>
+          <li><strong>Event:</strong> A signal fired by the system (often via a Business Rule) indicating something happened — e.g., <code>incident.commented</code>.</li>
+          <li><strong>Notification:</strong> A configured record that says "when this event fires (or this record changes in this way), send this message to these recipients."</li>
+          <li><strong>Recipients:</strong> Can be specific users, groups, or dynamically determined (e.g., "the record's Assigned to").</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Notification Flow</h3>
+        <div class="diagram"><pre>
+   Record Updated (e.g., Incident state changes to "Resolved")
+        │
+        ▼
+   Event fired (e.g., incident.resolved)
+        │
+        ▼
+   Notification record matches the event/condition
+        │
+        ▼
+   Email sent to configured Recipients (e.g., the Caller)
+        </pre></div>
+        <div class="example-box"><strong>Example:</strong> When an Incident's state changes to "Resolved," a notification automatically emails the Caller letting them know their issue has been addressed.</div>
+      </div>
+    </section>
+
+    <section class="module" id="module-15">
+      <div class="module-head">
+        <span class="module-num">MODULE 15</span>
+        <h2>Performance Analytics Basics</h2>
+        <button class="mark-done-btn" id="donebtn-15" onclick="toggleModuleDone(15)">Mark complete</button>
+      </div>
+
+      <div class="card">
+        <p>At the CSA level, you only need foundational awareness of Performance Analytics (PA) — a separate, more advanced trend-analysis application from standard Reporting.</p>
+        <ul>
+          <li><strong>Indicator:</strong> A specific metric tracked over time (e.g., "% of Incidents resolved within SLA").</li>
+          <li><strong>Widget:</strong> A visual display of one or more indicators (a chart, scorecard, etc.).</li>
+          <li><strong>Dashboard:</strong> A collection of widgets, same concept as in standard Reporting, but built for trend/historical analysis.</li>
+        </ul>
+        <div class="trick-box"><strong>Exam Trick:</strong> Know the difference at a high level: standard Reports show a snapshot of <em>current</em> data; Performance Analytics tracks indicators <em>over time</em> using recorded historical snapshots.</div>
+      </div>
+    </section>
+
+    <section class="module" id="module-16">
+      <div class="module-head">
+        <span class="module-num">MODULE 16</span>
+        <h2>Exam-Critical Concepts</h2>
+        <button class="mark-done-btn" id="donebtn-16" onclick="toggleModuleDone(16)">Mark complete</button>
+      </div>
+      <p style="color:var(--text-muted); margin-bottom:18px;">A high-yield set of the concepts most frequently tested on the CSA exam. Each includes a definition, example, exam trick, and the most common mistake students make.</p>
+
+      <div class="concept-grid" id="topConceptsGrid"></div>
+    </section>
+
+    <!-- MODULES_PLACEHOLDER -->
+
+    <script>
+    // Top 60 exam-critical concepts, rendered into module 16's grid
+    const TOP_CONCEPTS = [
+      ["sys_id","Every record's unique 32-character identifier","Two Incidents can have the same Number format but never the same sys_id","Questions sometimes use sys_id and Number interchangeably to trick you","Don't confuse the human-readable Number field with the internal sys_id"],
+      ["GlideRecord","Server-side script API to query/manipulate records","var gr=new GlideRecord('incident'); gr.get(sys_id);","CSA tests conceptual understanding, not syntax — know WHAT it does","Don't assume you need to write GlideRecord code for CSA; know its purpose"],
+      ["Business Rule","Server-side script that runs on database operations (before/after/async/display)","Auto-set Urgency when Priority changes","Know the 4 run types: before, after, async, display","Confusing 'before' (can change data before save) with 'after' (data already saved)"],
+      ["Client Script","Browser-side script reacting to form events (onLoad, onChange, onSubmit)","Show/hide a field based on a Choice value","Client Scripts can't directly query other tables without GlideAjax","Assuming client scripts run on the server — they run in the browser"],
+      ["UI Policy","No-code way to show/hide, make mandatory, or read-only fields based on conditions","Make 'Resolution notes' mandatory when State = Resolved","UI Policies are usually preferred over Client Scripts for simple field behavior","Using a full Client Script when a UI Policy alone would do the job"],
+      ["ACL","Row/field-level security rule (Create/Read/Update/Delete)","Restrict 'Salary' field read access to HR role only","All matching ACLs must pass — it's an AND, not an OR","Believing one passing ACL is enough if others apply"],
+      ["Update Set","Container moving configuration between instances","Moving a new Business Rule from Dev to Prod","Preview ≠ Commit — preview never changes anything","Thinking Update Sets move data records, not just configuration"],
+      ["Workflow / Flow Designer","Visual process automation tools (Flow Designer is the modern tool)","Auto-assign incidents based on category","Flow Designer replaces the legacy Workflow Editor going forward","Assuming Workflow Editor is still the primary recommended tool"],
+      ["Service Catalog","Self-service portal for requesting items/services","Ordering a new laptop","Order Guides bundle multiple items into one request","Confusing Record Producer (creates 1 record) with a normal Catalog Item (creates REQ/RITM)"],
+      ["Knowledge Base","Repository of articles for self-service answers","KB article on VPN reset steps","Articles go Draft → Review → Published → Retired","Assuming Draft articles are visible to all users"],
+      ["Import Set","Staging table for raw imported data","Excel upload landing before transformation","Import Set is never the final destination","Thinking the Import Set IS the target table"],
+      ["Transform Map","Maps Import Set fields to target table fields","Mapping 'Email' column to 'user_name' field","Can be re-run without re-importing the source file","Forgetting transform maps can include scripts, not just direct field mapping"],
+      ["Task table","Parent table for Incident, Problem, Change","Common fields like priority, state inherited by all","A Business Rule on Task affects all child tables","Assuming each child table needs its own duplicate logic"],
+      ["Dictionary (sys_dictionary)","Metadata defining every field's type/properties","Defines that 'Priority' is a Choice field","Field type lives in the dictionary, not the form layout","Confusing form layout (display) with dictionary (definition)"],
+      ["Reference field","Field type linking to another table's record","'Assigned to' points to sys_user","Displays a friendly value, stores a sys_id internally","Assuming the visible text IS the stored value"],
+      ["Journal field","Append-only field; entries can't be edited/deleted","Work notes on Incident","Perfect for audit trails because history is preserved","Treating Journal fields like editable String fields"],
+      ["Role inheritance","A role can contain other roles, granting all their access too","admin effectively contains every role","Removing a role doesn't remove sub-permissions gained elsewhere (e.g., direct + group)","Assuming roles are always mutually exclusive silos"],
+      ["Group vs Role","Group = collection of users; Role = permission grant","'Service Desk' group has 'itil' role assigned to it","Groups are often used for assignment; roles for permissions","Treating Group membership itself as a permission"],
+      ["Personal Developer Instance","Free individual ServiceNow sandbox for learning","Used by students prepping for CSA","Doesn't replace a company's Dev/Test/Prod path","Confusing PDI with a company's official Development instance"],
+      ["Multi-instance architecture","Each customer gets a dedicated DB, not shared multi-tenant data","No cross-customer data visibility, ever","A major ServiceNow differentiator vs typical SaaS","Assuming 'cloud' implies shared database with other tenants"],
+      ["Record Producer","Catalog-style form that creates a record in a non-catalog table directly","Friendly UI for submitting an Incident","Skips creating a REQ/RITM — goes straight to the target table","Confusing it with a standard Catalog Item, which always creates REQ/RITM"],
+      ["Related List","Shows records from another table referencing the current record","'Affected CIs' on Incident form","Lives at the bottom of a form, not inside the main section","Thinking related list data is stored on the current record's table"],
+      ["List vs Form view","List = many records, Form = one record in detail","Clicking a list row opens its Form","Personalize List is personal; Configure Form Layout affects the form template","Mixing up 'Personalize List' (personal) with global list changes"],
+      ["Notification","Pre-configured message triggered by an event/condition","Email Caller when Incident is Resolved","Recipients can be dynamic (e.g., 'Assigned to') not just fixed users","Assuming notifications always need a separate manually-fired event"],
+      ["Event","A signal the system fires, often consumed by Notifications/scripts","incident.resolved event","Events decouple 'something happened' from 'what to do about it'","Confusing Events with Notifications themselves — Events trigger Notifications"],
+      ["Choice field","Dropdown list of predefined values","Priority: 1 - Critical...5 - Planning","Options are stored as sys_choice records tied to the field","Assuming choice values are hardcoded in the field definition itself"],
+      ["Boolean field","True/false checkbox","'Active' on User table","Deactivating a user preserves their record/history","Confusing 'Active = false' with permanent deletion"],
+      ["Performance Analytics","Tracks indicators historically over time","% SLA compliance trend over 6 months","Different from standard Reports, which show current snapshots","Treating PA and Reporting as identical tools"],
+      ["Sections (Form)","Group related fields visually on a form","'Caller Information' section on Incident","Configured via Configure Form Layout","Assuming Sections require scripting to create"],
+      ["Application Navigator","Sidebar listing accessible Applications and Modules","Incident > Open module link","Filter Navigator lets you search/jump quickly","Confusing 'Application' (top-level) with 'Module' (the link inside it)"],
+      ["History vs Favorites","History = automatic recent records; Favorites = manual bookmarks","Last 5 viewed Incidents = History","You don't add to History manually","Assuming Favorites auto-populates"],
+      ["Catalog Item vs Order Guide","Item = single requestable thing; Order Guide = bundle of items","Laptop Request (item) vs Onboarding Kit (order guide)","Order Guides streamline multi-item requests like onboarding","Treating Order Guides as just a bigger catalog item"],
+      ["ACL evaluation order","All applicable ACLs must pass (AND logic)","Table-level AND field-level ACL both must pass","One failing ACL blocks the entire operation","Assuming any single passing ACL is sufficient"],
+      ["Back Out (Update Set)","Reverses a previously committed Update Set","Undo a bad config push to Production","Different from simply deleting the Update Set record","Confusing deleting an Update Set with backing it out"],
+      ["Preview (Update Set)","Non-destructive check for conflicts before commit","Detects a collision with an existing customization","Nothing changes in Preview — it's purely informational","Assuming Preview applies any changes"],
+      ["Knowledge Article approval","Required step before publishing","IT Manager approves a VPN reset article","Keeps unreviewed info from reaching end users","Assuming any agent can self-publish without review"],
+      ["Catalog Task (SCTASK)","Fulfillment step generated from an RITM","'Procure laptop' task assigned to procurement","Multiple SCTASKs can stem from a single RITM","Confusing SCTASK with RITM — RITM is the requested item, SCTASK is a fulfillment step"],
+      ["REQ vs RITM","Request (REQ) is the overall order; RITM is one item within it","One REQ can contain multiple RITMs","Ordering 3 items in one cart = 1 REQ, 3 RITMs","Assuming REQ and RITM are interchangeable terms"],
+      ["Subflow","Reusable flow logic callable from multiple parent flows","Shared 'Send Approval Email' subflow","Avoids duplicating identical logic across flows","Building the same logic repeatedly instead of using a subflow"],
+      ["Trigger (Flow Designer)","The event that starts a flow running","Record Created on Incident table","Different trigger types exist: record-based, scheduled, catalog-based","Assuming all flows must be triggered manually"],
+      ["Dictionary Override","Allows a field's properties to differ on a child table vs parent","Making a field mandatory only on Incident, not all Task children","Useful for tailoring shared fields per child table","Assuming all child tables must share identical field behavior always"],
+      ["Date vs Date/Time field","Date = calendar date only; Date/Time = date+time, time-zone adjusted","'Opened' (Date/Time) vs custom 'Due date' (Date)","Date/Time displays differ by viewer's time zone setting","Assuming Date/Time always displays the same value to every user"],
+      ["sys_user table","Base table storing all user records","Every login account is a row here","Roles, groups, and many references point back to this table","Confusing sys_user (a person) with sys_user_group (a group)"],
+      ["sys_user_group table","Stores Group records","'Service Desk' group record","Groups can have a manager, members, and assigned roles","Assuming groups themselves grant access without an assigned role"],
+      ["Table extension","Child table inherits parent's fields and adds its own","Incident extends Task, adds caller_id","Logic on the parent automatically applies to all children","Believing child tables need everything redefined manually"],
+      ["Glide engine","The application layer rendering forms/lists from metadata","Reads sys_dictionary + ACLs to build a form dynamically","Means UI changes (no-code) instantly reflect without redeployment","Assuming UI changes always require custom development"],
+      ["Personalize List vs List Layout","Personalize = individual user view; List Layout (admin) = default for everyone","A user reorders columns just for themselves","Only an admin changing List Layout affects all users by default","Assuming any list customization is global"],
+      ["Schema Map","Visual tool showing table relationships","Visualizing how Incident relates to CMDB CI","Helps admins understand reference field connections at a glance","Confusing Schema Map with the Dictionary itself"],
+      ["Default value (dictionary)","Pre-fills a field when a new record is created","Priority defaults to '3 - Moderate'","Doesn't prevent the user from changing it unless also read-only","Assuming a default value also makes a field mandatory"],
+      ["Mandatory field","Must be filled before the record can be saved","Short description is mandatory on Incident","Enforced at save time, may also trigger inline form warnings","Confusing mandatory with read-only — they control different behaviors"],
+      ["Read-only field","Field is visible but cannot be edited by the user","Number field is read-only after creation","Can be set via dictionary or conditionally via UI Policy","Assuming read-only fields are also hidden — they're still visible"],
+      ["Audit history","System-tracked record of field value changes over time","Seeing Priority changed from 2 to 1 with timestamp/user","Useful for compliance and troubleshooting 'who changed what'","Assuming all fields are audited by default without configuration"],
+      ["Domain Separation","Advanced feature isolating data between business units","MSP isolating Client A's data from Client B within one instance","Different from multi-instance — this is isolation WITHIN one instance","Confusing Domain Separation with the customer-level multi-instance model"],
+      ["Service Level Agreement (SLA)","Tracks time-based commitments on a task (e.g., respond within 1 hour)","Priority 1 Incident must be resolved within 4 hours","SLAs can pause/stop based on conditions like 'Awaiting Customer'","Assuming SLA timers always run continuously with no pause logic"],
+      ["Assignment Group vs Assigned to","Group = team responsible; Assigned to = specific individual","Group: Network Support; Assigned to: Priya (a member of that group)","A record can have a group without yet having an individual assigned","Assuming a ticket can't exist without an individual already assigned"],
+      ["CMDB / Configuration Item (CI)","Database of an org's IT assets/services and their relationships","A laptop, server, or business service tracked as a CI","Incidents can be linked to affected CIs for impact analysis","Confusing CI records with simple asset/inventory records lacking relationships"],
+      ["Self-Service Portal","End-user-facing website for catalog requests, KB search, ticket status","Employee logs in to order a laptop and check ticket status","Distinct from the agent-facing core UI (Now Workspace/Classic UI)","Assuming the portal and the agent UI are the same interface"],
+      ["Variable (Catalog)","A custom input field on a Catalog Item's request form","'Laptop color' dropdown on a hardware request","Variables map to fields on the resulting RITM/target record","Confusing catalog Variables with standard table Dictionary fields"],
+      ["UI Action","A button/link triggering custom script logic on a form/list","A custom 'Escalate' button on Incident form","Can be configured to show conditionally based on role/state","Assuming all buttons on a form are out-of-box with no configuration"],
+      ["sys_id vs Display Value","sys_id = internal unique key; Display Value = human-friendly shown text","Reference field shows 'Priya Patel' but stores her sys_id","CSA tests if you know these are two different things for the same field","Believing what's displayed on screen is literally what's stored in the DB"]
+    ];
+    function renderTopConcepts(){
+      const grid = document.getElementById('topConceptsGrid');
+      if(!grid) return;
+      grid.innerHTML = TOP_CONCEPTS.map((c,i)=>`
+        <div class="concept-card">
+          <div class="cnum">CONCEPT ${i+1}</div>
+          <h4>${c[0]}</h4>
+          <div class="clabel">Definition</div><p class="ctext">${c[1]}</p>
+          <div class="clabel">Example</div><p class="ctext">${c[2]}</p>
+          <div class="clabel">Exam Trick</div><p class="ctext">${c[3]}</p>
+          <div class="clabel">Common Mistake</div><p class="ctext">${c[4]}</p>
+        </div>`).join('');
+    }
+    renderTopConcepts();
+    </script>
+
+    <div class="bottom-nav">
+      <a href="index.html"><span class="lbl">Back to</span><span>Dashboard</span></a>
+      <a href="flashcards.html" class="next-link"><span class="lbl">Next</span><span>Flashcards →</span></a>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+/* ===== Theme ===== */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('csa_theme', t);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(cur);
+}
+applyTheme(localStorage.getItem('csa_theme') || 'light');
+
+/* ===== Sidebar mobile ===== */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+/* ===== Module nav + progress ===== */
+const MODULE_TITLES = [
+  "Platform Overview","User Interface","Users, Groups & Roles","Tables & Databases",
+  "Forms & Lists","Dictionary & Fields","Service Catalog","Knowledge Management",
+  "Flow Designer","Reporting","Importing Data","Update Sets","Security (ACL)",
+  "Notifications","Performance Analytics Basics","Exam-Critical Concepts (Top 60)"
+];
+function getProgress(){
+  try{ return JSON.parse(localStorage.getItem('csa_progress_modules') || '{}'); }catch(e){ return {}; }
+}
+function saveProgress(p){ localStorage.setItem('csa_progress_modules', JSON.stringify(p)); }
+
+function buildModuleNav(){
+  const list = document.getElementById('module-nav-list');
+  const progress = getProgress();
+  let html = '';
+  MODULE_TITLES.forEach((title, i)=>{
+    const n = i+1;
+    const done = progress['m'+n] ? 'done' : '';
+    html += `<a class="nav-link" href="#module-${n}" onclick="closeSidebar()"><span>${n}. ${title}</span><span class="check ${done}" id="navcheck-${n}"></span></a>`;
+  });
+  list.innerHTML = html;
+}
+function updateProgressPill(){
+  const progress = getProgress();
+  const count = Object.values(progress).filter(Boolean).length;
+  document.getElementById('progressPill').textContent = `${count} / 16 modules`;
+}
+function toggleModuleDone(n){
+  const progress = getProgress();
+  progress['m'+n] = !progress['m'+n];
+  saveProgress(progress);
+  const btn = document.getElementById('donebtn-'+n);
+  const check = document.getElementById('navcheck-'+n);
+  if(btn) btn.classList.toggle('done', !!progress['m'+n]);
+  if(btn) btn.textContent = progress['m'+n] ? '✓ Completed' : 'Mark complete';
+  if(check) check.classList.toggle('done', !!progress['m'+n]);
+  updateProgressPill();
+}
+function initDoneButtons(){
+  const progress = getProgress();
+  for(let n=1;n<=16;n++){
+    const btn = document.getElementById('donebtn-'+n);
+    if(btn && progress['m'+n]){ btn.classList.add('done'); btn.textContent = '✓ Completed'; }
+  }
+}
+buildModuleNav();
+updateProgressPill();
+
+/* ===== Collapsibles ===== */
+function toggleCollapse(el){
+  el.parentElement.classList.toggle('open');
+}
+
+/* ===== Search ===== */
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+let searchIndex = [];
+function buildSearchIndex(){
+  document.querySelectorAll('.module').forEach(mod=>{
+    const modTitle = mod.querySelector('h2') ? mod.querySelector('h2').textContent : '';
+    const modId = mod.id;
+    mod.querySelectorAll('h3, h4').forEach(h=>{
+      searchIndex.push({title:h.textContent, module:modTitle, id: modId, text:(h.parentElement.textContent||'').slice(0,140)});
+    });
+  });
+}
+searchInput.addEventListener('input', function(){
+  const q = this.value.trim().toLowerCase();
+  if(q.length < 2){ searchResults.classList.remove('open'); return; }
+  const matches = searchIndex.filter(item => item.title.toLowerCase().includes(q) || item.text.toLowerCase().includes(q)).slice(0,8);
+  if(matches.length === 0){ searchResults.innerHTML = '<div class="search-result-item">No results found.</div>'; searchResults.classList.add('open'); return; }
+  searchResults.innerHTML = matches.map(m => `<div class="search-result-item" onclick="document.getElementById('${m.id}').scrollIntoView({behavior:'smooth'}); searchResults.classList.remove('open');"><span class="srt">${m.title}</span><span class="srm">${m.module}</span></div>`).join('');
+  searchResults.classList.add('open');
+});
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.search-wrap')) searchResults.classList.remove('open');
+});
+
+window.addEventListener('DOMContentLoaded', function(){
+  buildSearchIndex();
+  initDoneButtons();
+  // highlight active module link on scroll
+});
+</script>
+</body>
+</html>

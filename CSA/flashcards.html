@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards | ServiceNow CSA Study Portal</title>
+<style>
+:root{
+  --bg:#FFFFFF; --bg-secondary:#F5F5F5; --card:#FFFFFF; --text:#1F2937; --text-muted:#6B7280;
+  --accent:#2C5282; --accent-soft:#EBF2FA; --border:#E5E7EB; --success:#2F855A; --danger:#C53030; --warning:#9C6F19;
+  --shadow:0 1px 3px rgba(0,0,0,0.06); --shadow-hover:0 4px 12px rgba(0,0,0,0.08);
+  --radius:10px; --sidebar-w:268px;
+}
+[data-theme="dark"]{
+  --bg:#0F1419; --bg-secondary:#161D26; --card:#1B232D; --text:#E5E9EE; --text-muted:#8B97A5;
+  --accent:#6FA8DC; --accent-soft:#1B2C3D; --border:#2B3641; --success:#48BB78; --danger:#F56565; --warning:#ECC94B;
+  --shadow:0 1px 3px rgba(0,0,0,0.3); --shadow-hover:0 4px 16px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.65; font-size:16px; transition:background .2s,color .2s;
+}
+h1,h2,h3,h4{font-family:Georgia,'Times New Roman',serif; font-weight:600; color:var(--text); line-height:1.3;}
+a{color:var(--accent); text-decoration:none;}
+a:hover{text-decoration:underline;}
+::selection{background:var(--accent-soft);}
+
+/* Layout */
+.app{display:flex; min-height:100vh;}
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; background:var(--bg-secondary); border-right:1px solid var(--border);
+  position:fixed; top:0; left:0; height:100vh; overflow-y:auto; padding:20px 0 40px; z-index:100;
+  transition:transform .25s ease;
+}
+.sidebar-brand{padding:0 20px 16px; border-bottom:1px solid var(--border); margin-bottom:14px;}
+.sidebar-brand .logo-row{display:flex; align-items:center; gap:10px;}
+.sidebar-brand .badge{width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Georgia,serif;font-size:15px;flex-shrink:0;}
+.sidebar-brand h1{font-size:16px; margin:0; line-height:1.25;}
+.sidebar-brand p{font-size:12px; color:var(--text-muted); margin:2px 0 0;}
+.nav-group{margin-bottom:6px;}
+.nav-group-label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:14px 20px 6px; font-weight:600;}
+.nav-link{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 20px; font-size:14px;
+  color:var(--text); border-left:3px solid transparent; cursor:pointer;
+}
+.nav-link:hover{background:var(--accent-soft); text-decoration:none;}
+.nav-link.active{border-left-color:var(--accent); background:var(--accent-soft); font-weight:600; color:var(--accent);}
+.nav-link .check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;}
+.nav-link .check.done{background:var(--success);border-color:var(--success);}
+.module-sub-list{display:none; flex-direction:column;}
+.module-sub-list.open{display:flex;}
+.module-sub-list a{padding:6px 20px 6px 40px; font-size:12.5px; color:var(--text-muted); display:block;}
+.module-sub-list a:hover{color:var(--accent);}
+
+.main{margin-left:var(--sidebar-w); flex:1; min-width:0;}
+.topbar{
+  position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; padding:12px 28px;
+}
+.search-wrap{flex:1; max-width:480px; position:relative;}
+.search-wrap input{
+  width:100%; padding:9px 14px 9px 34px; border-radius:8px; border:1px solid var(--border); background:var(--bg-secondary);
+  color:var(--text); font-size:14px;
+}
+.search-wrap input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.search-icon{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;}
+.search-results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; box-shadow:var(--shadow-hover); max-height:360px; overflow-y:auto; display:none; z-index:60;
+}
+.search-results.open{display:block;}
+.search-result-item{padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px;}
+.search-result-item:last-child{border-bottom:none;}
+.search-result-item:hover{background:var(--accent-soft);}
+.search-result-item .srt{font-weight:600; display:block; margin-bottom:2px;}
+.search-result-item .srm{color:var(--text-muted); display:block;}
+.topbar-right{display:flex; align-items:center; gap:10px; margin-left:auto;}
+.icon-btn{
+  width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+}
+.icon-btn:hover{background:var(--accent-soft);}
+.menu-toggle{display:none;}
+.progress-pill{
+  font-size:12.5px; padding:7px 12px; border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; white-space:nowrap;
+}
+
+.content{padding:32px 40px 80px; max-width:980px;}
+.page-header{margin-bottom:8px;}
+.page-header .eyebrow{font-size:12.5px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+.page-header h1{font-size:30px; margin:0 0 6px;}
+.page-header .sub{color:var(--text-muted); font-size:15px; max-width:680px;}
+
+.module{margin-top:56px; padding-top:8px; border-top:1px solid var(--border);}
+.module:first-of-type{border-top:none; margin-top:36px;}
+.module-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+.module-num{font-family:Georgia,serif; font-size:14px; color:var(--accent); font-weight:700;}
+.module h2{font-size:23px; margin:0;}
+.mark-done-btn{
+  margin-left:auto; font-size:12px; padding:6px 12px; border-radius:7px; border:1px solid var(--border); background:var(--card);
+  color:var(--text-muted); cursor:pointer; font-weight:600;
+}
+.mark-done-btn.done{background:var(--success); color:#fff; border-color:var(--success);}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin:18px 0; box-shadow:var(--shadow);}
+.card h3{font-size:17px; margin:0 0 10px;}
+.card h4{font-size:14.5px; margin:16px 0 6px;}
+.card p{margin:8px 0;}
+.card ul, .card ol{margin:8px 0; padding-left:22px;}
+.card li{margin:4px 0;}
+
+.example-box{
+  background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+.example-box strong{color:var(--accent);}
+.trick-box{
+  background:rgba(236,201,75,0.08); border-left:3px solid var(--warning); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .trick-box{background:rgba(236,201,75,0.06);}
+.trick-box strong{color:var(--warning);}
+.mistake-box{
+  background:rgba(197,48,48,0.06); border-left:3px solid var(--danger); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .mistake-box{background:rgba(245,101,101,0.06);}
+.mistake-box strong{color:var(--danger);}
+
+table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border);}
+th{background:var(--bg-secondary); font-weight:700; color:var(--text);}
+tr:hover{background:var(--bg-secondary);}
+
+.diagram{
+  background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:22px;
+  margin:16px 0; font-family:'SF Mono',Consolas,monospace; font-size:13px; overflow-x:auto;
+}
+.diagram pre{margin:0; white-space:pre;}
+.flow-svg{display:block; margin:16px auto; max-width:100%;}
+
+.tag{display:inline-block; font-size:11px; padding:3px 9px; border-radius:12px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin:2px 4px 2px 0;}
+
+.collapsible{border:1px solid var(--border); border-radius:8px; margin:12px 0; overflow:hidden;}
+.collapsible-head{
+  display:flex; justify-content:space-between; align-items:center; padding:12px 16px; cursor:pointer; background:var(--card); font-weight:600; font-size:14.5px;
+}
+.collapsible-head:hover{background:var(--bg-secondary);}
+.collapsible-head .arrow{transition:transform .2s; color:var(--text-muted); font-size:12px;}
+.collapsible.open .collapsible-head .arrow{transform:rotate(90deg);}
+.collapsible-body{display:none; padding:0 16px 16px; font-size:14.5px;}
+.collapsible.open .collapsible-body{display:block;}
+
+.exam-q{background:var(--bg-secondary); border-radius:8px; padding:14px 16px; margin:12px 0; font-size:14px;}
+.exam-q .q-label{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;}
+.exam-q .q-answer{margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); color:var(--text-muted); font-size:13.5px;}
+
+.concept-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0;}
+@media (max-width:700px){.concept-grid{grid-template-columns:1fr;}}
+.concept-card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.concept-card .cnum{font-size:11px; color:var(--accent); font-weight:700;}
+.concept-card h4{margin:4px 0 8px; font-size:15px;}
+.concept-card .clabel{font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-top:8px;}
+.concept-card .ctext{font-size:13.5px; margin:2px 0 0;}
+
+.bottom-nav{display:flex; justify-content:space-between; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); gap:12px;}
+.bottom-nav a{
+  flex:1; padding:14px 18px; border:1px solid var(--border); border-radius:8px; font-size:14px; color:var(--text);
+  display:flex; flex-direction:column; gap:2px;
+}
+.bottom-nav a:hover{background:var(--accent-soft); text-decoration:none;}
+.bottom-nav .lbl{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;}
+.bottom-nav .next-link{text-align:right;}
+
+@media (max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0); box-shadow:4px 0 20px rgba(0,0,0,0.2);}
+  .main{margin-left:0;}
+  .menu-toggle{display:flex;}
+  .content{padding:24px 18px 60px;}
+  .concept-grid{grid-template-columns:1fr;}
+  .search-wrap{max-width:none;}
+  .progress-pill{display:none;}
+}
+.overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90;}
+.overlay.open{display:block;}
+
+.fc-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:18px 0 24px;}
+.fc-select{padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:13.5px;}
+.fc-btn{padding:8px 14px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:13.5px; cursor:pointer; font-weight:600;}
+.fc-btn:hover{background:var(--accent-soft);}
+.fc-btn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+.fc-stats{display:flex; gap:18px; margin:0 0 20px; flex-wrap:wrap;}
+.fc-stat{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:10px 16px; font-size:13px; color:var(--text-muted);}
+.fc-stat b{color:var(--text); font-size:16px; display:block; font-family:Georgia,serif;}
+.fc-stage{display:flex; flex-direction:column; align-items:center; gap:18px; margin:10px 0 30px;}
+.fc-progress-bar{width:100%; max-width:560px; height:6px; background:var(--bg-secondary); border-radius:3px; overflow:hidden;}
+.fc-progress-fill{height:100%; background:var(--accent); transition:width .25s;}
+.fc-card-wrap{width:100%; max-width:560px; height:300px; perspective:1200px;}
+.fc-card{width:100%; height:100%; position:relative; transition:transform .45s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d; cursor:pointer;}
+.fc-card.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:14px; border:1px solid var(--border); background:var(--card); box-shadow:var(--shadow-hover); padding:28px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;}
+.fc-face .fc-tag{position:absolute; top:16px; left:16px;}
+.fc-face .fc-hint{position:absolute; bottom:16px; font-size:11.5px; color:var(--text-muted);}
+.fc-face-front .fc-q{font-size:19px; font-weight:600; line-height:1.4; font-family:Georgia,serif;}
+.fc-face-back{transform:rotateY(180deg); background:var(--accent-soft);}
+.fc-face-back .fc-a{font-size:16px; line-height:1.55;}
+.fc-controls{display:flex; gap:10px; align-items:center;}
+.fc-controls .fc-icon{width:46px;height:46px;border-radius:50%;border:1px solid var(--border);background:var(--card);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.fc-controls .fc-icon:hover{background:var(--accent-soft);}
+.fc-know-btns{display:flex; gap:12px;}
+.fc-know-btns button{padding:11px 22px; border-radius:8px; border:1px solid var(--border); font-size:14px; font-weight:600; cursor:pointer; background:var(--card); color:var(--text);}
+.fc-know-btns .fc-no{border-color:var(--danger); color:var(--danger);}
+.fc-know-btns .fc-no:hover{background:rgba(197,48,48,0.08);}
+.fc-know-btns .fc-yes{border-color:var(--success); color:var(--success);}
+.fc-know-btns .fc-yes:hover{background:rgba(47,133,90,0.08);}
+.fc-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:30px;}
+.fc-mini{border:1px solid var(--border); border-radius:8px; padding:10px; font-size:11.5px; cursor:pointer; background:var(--card); text-align:center;}
+.fc-mini.known{border-color:var(--success); background:rgba(47,133,90,0.06);}
+.fc-mini:hover{background:var(--accent-soft);}
+@media (max-width:600px){.fc-card-wrap{height:340px;}}
+
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-row">
+      <div class="badge">SN</div>
+      <div>
+        <h1>CSA Study Portal</h1>
+        <p>Certified System Administrator</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-group">
+    <a class="nav-link" href="index.html"><span>Dashboard</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Theory — 16 Modules</div>
+    <div id="module-nav-list"></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Practice</div>
+    <a class="nav-link" href="flashcards.html"><span>Flashcards (150)</span></a>
+    <a class="nav-link" href="mocktest1.html"><span>Mock Test 1</span></a>
+    <a class="nav-link" href="mocktest2.html"><span>Mock Test 2</span></a>
+    <a class="nav-link" href="mocktest3.html"><span>Mock Test 3</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Revision</div>
+    <a class="nav-link" href="revision.html"><span>Rapid Revision & Exam Guide</span></a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search flashcards..." autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div class="topbar-right">
+      <span class="progress-pill" id="progressPill">0 / 150 known</span>
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="eyebrow">Active Recall</div>
+      <h1>CSA Flashcards</h1>
+      <p class="sub">150 flashcards across Tables, Roles, Service Catalog, ACL, Update Sets, Reports, Flow Designer, and general CSA concepts. Click a card to flip it, mark whether you knew it, and track your progress.</p>
+    </div>
+
+    <div class="fc-stats">
+      <div class="fc-stat"><b id="statTotal">150</b>Total cards</div>
+      <div class="fc-stat"><b id="statKnown">0</b>Marked known</div>
+      <div class="fc-stat"><b id="statRemaining">150</b>In current set</div>
+    </div>
+
+    <div class="fc-toolbar">
+      <select class="fc-select" id="topicFilter" onchange="applyFilter()">
+        <option value="all">All Topics (150)</option>
+      </select>
+      <button class="fc-btn" onclick="shuffleDeck()">🔀 Shuffle</button>
+      <button class="fc-btn" onclick="resetKnown()">↺ Reset progress</button>
+      <button class="fc-btn primary" id="unknownOnlyBtn" onclick="toggleUnknownOnly()">Show only unknown</button>
+    </div>
+
+    <div class="fc-stage">
+      <div class="fc-progress-bar"><div class="fc-progress-fill" id="progressFill" style="width:0%"></div></div>
+
+      <div class="fc-card-wrap">
+        <div class="fc-card" id="fcCard" onclick="flipCard()">
+          <div class="fc-face fc-face-front">
+            <span class="tag fc-tag" id="cardTopic">Tables</span>
+            <div class="fc-q" id="cardFront">Loading...</div>
+            <span class="fc-hint">Click to reveal answer</span>
+          </div>
+          <div class="fc-face fc-face-back">
+            <span class="tag fc-tag" id="cardTopicBack">Tables</span>
+            <div class="fc-a" id="cardBack"></div>
+            <span class="fc-hint">Click to flip back</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fc-controls">
+        <button class="fc-icon" onclick="prevCard(event)" aria-label="Previous card">←</button>
+        <div class="fc-know-btns">
+          <button class="fc-no" onclick="markCard(event,false)">Still learning</button>
+          <button class="fc-yes" onclick="markCard(event,true)">I know this ✓</button>
+        </div>
+        <button class="fc-icon" onclick="nextCard(event)" aria-label="Next card">→</button>
+      </div>
+      <div style="color:var(--text-muted); font-size:13px;" id="cardCounter">Card 1 of 150</div>
+    </div>
+
+    <h3 style="margin-top:8px;">All Cards (click any to jump)</h3>
+    <div class="fc-grid" id="fcGrid"></div>
+
+    <div class="bottom-nav">
+      <a href="theory.html"><span class="lbl">Back to</span><span>Theory Guide</span></a>
+      <a href="mocktest1.html" class="next-link"><span class="lbl">Next</span><span>Mock Test 1 →</span></a>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* ===== Theme (shared pattern) ===== */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('csa_theme', t);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(cur);
+}
+applyTheme(localStorage.getItem('csa_theme') || 'light');
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+const MODULE_TITLES = [
+  "Platform Overview","User Interface","Users, Groups & Roles","Tables & Databases",
+  "Forms & Lists","Dictionary & Fields","Service Catalog","Knowledge Management",
+  "Flow Designer","Reporting","Importing Data","Update Sets","Security (ACL)",
+  "Notifications","Performance Analytics Basics","Exam-Critical Concepts (Top 60)"
+];
+function getProgress(){ try{ return JSON.parse(localStorage.getItem('csa_progress_modules') || '{}'); }catch(e){ return {}; } }
+function buildModuleNav(){
+  const list = document.getElementById('module-nav-list');
+  const progress = getProgress();
+  let html = '';
+  MODULE_TITLES.forEach((title, i)=>{
+    const n = i+1;
+    const done = progress['m'+n] ? 'done' : '';
+    html += `<a class="nav-link" href="theory.html#module-${n}"><span>${n}. ${title}</span><span class="check ${done}"></span></a>`;
+  });
+  list.innerHTML = html;
+}
+buildModuleNav();
+
+/* ===== Flashcard App ===== */
+const ALL_CARDS = [{"topic": "Tables", "front": "What table do Incident, Problem, and Change Request all extend from?", "back": "Task — they all inherit its common fields like priority, state, and assigned_to.", "id": 1}, {"topic": "Tables", "front": "What is a 'base table'?", "back": "A standalone table that doesn't extend from any other table, e.g. sys_user.", "id": 2}, {"topic": "Tables", "front": "What is the relationship between a parent and child table?", "back": "The child table extends the parent, inheriting all its fields and adding its own.", "id": 3}, {"topic": "Tables", "front": "Where is a field's type (String, Reference, etc.) defined?", "back": "In the Dictionary (sys_dictionary table).", "id": 4}, {"topic": "Tables", "front": "What does a Business Rule on the Task table do for Incident and Problem?", "back": "It runs automatically for both, since they extend Task.", "id": 5}, {"topic": "Tables", "front": "What is the sys_id of a record?", "back": "A unique 32-character identifier assigned to every record, distinct from the human-readable Number.", "id": 6}, {"topic": "Tables", "front": "True or False: Every child table stores a complete duplicate copy of all parent fields.", "back": "False — conceptually it inherits parent fields; data is effectively joined, not duplicated.", "id": 7}, {"topic": "Tables", "front": "What does 'extending' a table let you avoid?", "back": "Re-defining the same common fields and logic on every related table.", "id": 8}, {"topic": "Tables", "front": "Name three tables that extend Task.", "back": "Incident, Problem, Change Request.", "id": 9}, {"topic": "Tables", "front": "What's stored in a 'Record'?", "back": "One row of data in a table — e.g., one specific Incident.", "id": 10}, {"topic": "Tables", "front": "What's a 'Field' in ServiceNow terms?", "back": "A column in a table, e.g. Priority or Short Description.", "id": 11}, {"topic": "Tables", "front": "What does 'Schema' refer to?", "back": "The overall structure of tables and how they relate to each other.", "id": 12}, {"topic": "Tables", "front": "Can a child table add fields not present on its parent?", "back": "Yes — it inherits parent fields and can add its own unique fields.", "id": 13}, {"topic": "Tables", "front": "Is 'parent' and 'child' a fixed label for a table?", "back": "No — it's relative; a table can be a child of one table and a parent of another.", "id": 14}, {"topic": "Tables", "front": "What table does the Change Request table extend?", "back": "Task.", "id": 15}, {"topic": "Tables", "front": "Why is the Task table central to ITSM in ServiceNow?", "back": "Because most ITSM processes (Incident, Problem, Change) share its structure via extension.", "id": 16}, {"topic": "Tables", "front": "Where would you go to view a table's structure and fields administratively?", "back": "System Definition > Tables (or the Dictionary).", "id": 17}, {"topic": "Tables", "front": "What happens to existing child-table records if you add a new field to the parent Task table?", "back": "They automatically gain access to that new field since they inherit from Task.", "id": 18}, {"topic": "Tables", "front": "Give an example of data NOT stored via table extension from Task.", "back": "User records (sys_user) — they're a base table unrelated to Task.", "id": 19}, {"topic": "Tables", "front": "What's the practical benefit of extending Task for Incident, Problem, and Change?", "back": "Shared reporting, shared business logic, and consistent core fields across ITSM processes.", "id": 20}, {"topic": "Roles", "front": "What is a Role in ServiceNow?", "back": "A named permission grant that unlocks access to specific data or UI, e.g. itil or admin.", "id": 21}, {"topic": "Roles", "front": "What is Role Inheritance?", "back": "When a role contains another role, granting all of that role's permissions automatically.", "id": 22}, {"topic": "Roles", "front": "Can a user get a role without it being directly assigned to them?", "back": "Yes — by being a member of a Group that has the role assigned.", "id": 23}, {"topic": "Roles", "front": "If a user is removed from a group, do they lose a role also assigned directly to their user record?", "back": "No — directly-assigned roles remain even if group membership changes.", "id": 24}, {"topic": "Roles", "front": "What table stores Role assignments to users?", "back": "sys_user_role.", "id": 25}, {"topic": "Roles", "front": "What does the itil role typically grant access to?", "back": "Working with Incidents, Problems, and Changes.", "id": 26}, {"topic": "Roles", "front": "Does the admin role need every other role explicitly assigned?", "back": "No — admin implicitly has access to everything across the system.", "id": 27}, {"topic": "Roles", "front": "What's the benefit of assigning a role to a Group instead of each user individually?", "back": "Easier management at scale — adding/removing group members controls access without editing each user.", "id": 28}, {"topic": "Roles", "front": "Can a single user belong to multiple groups with different roles?", "back": "Yes — they inherit the union of roles from all their group memberships plus any direct roles.", "id": 29}, {"topic": "Roles", "front": "What two sources can grant a user a role?", "back": "Direct assignment to their user record, or inheritance via group membership.", "id": 30}, {"topic": "Roles", "front": "What's the table that stores Group definitions?", "back": "sys_user_group.", "id": 31}, {"topic": "Roles", "front": "What's the table that stores User records?", "back": "sys_user.", "id": 32}, {"topic": "Roles", "front": "If Role A contains Role B, what happens to a user with Role A?", "back": "They automatically also get all permissions granted by Role B.", "id": 33}, {"topic": "Roles", "front": "Scenario: John has no direct roles but is in a group with the itil role. Does he get itil access?", "back": "Yes — group-inherited roles apply just like direct ones.", "id": 34}, {"topic": "Roles", "front": "What is the most common mistake about role removal?", "back": "Forgetting a user may still have the role through another source (direct or another group).", "id": 35}, {"topic": "Roles", "front": "What does the catalog_admin role typically allow?", "back": "Administering Service Catalog items, categories, and configuration.", "id": 36}, {"topic": "Roles", "front": "Is Role assignment to a Group itself sufficient to grant a permission, or does the role need to actually exist as a defined role record?", "back": "The role must exist as a defined role; group assignment then grants it to all members.", "id": 37}, {"topic": "Roles", "front": "What's a common real-world scenario for role inheritance?", "back": "A senior support role containing a junior role so seniors automatically retain junior-level access too.", "id": 38}, {"topic": "Service Catalog", "front": "What is a Catalog Item?", "back": "An individual requestable thing in the Service Catalog, e.g. 'New Laptop'.", "id": 39}, {"topic": "Service Catalog", "front": "What is a Category in the Service Catalog?", "back": "A grouping of related catalog items, e.g. 'Hardware'.", "id": 40}, {"topic": "Service Catalog", "front": "What is an Order Guide?", "back": "A bundle of multiple catalog items that can be ordered together in one request.", "id": 41}, {"topic": "Service Catalog", "front": "What is a Record Producer?", "back": "A catalog-style form that creates a record directly in a target table (like Incident) instead of generating a REQ/RITM.", "id": 42}, {"topic": "Service Catalog", "front": "What gets created when a user orders a Catalog Item?", "back": "A Request (REQ), a Requested Item (RITM), and one or more Catalog Tasks (SCTASK).", "id": 43}, {"topic": "Service Catalog", "front": "What's the difference between REQ and RITM?", "back": "REQ is the overall order; RITM is one specific item within that order.", "id": 44}, {"topic": "Service Catalog", "front": "Can one REQ contain multiple RITMs?", "back": "Yes — ordering multiple items in one cart creates one REQ with multiple RITMs.", "id": 45}, {"topic": "Service Catalog", "front": "What is a Catalog Task (SCTASK)?", "back": "A fulfillment step generated from an RITM, assigned to a team to complete part of the request.", "id": 46}, {"topic": "Service Catalog", "front": "Give an example of when an Order Guide is useful.", "back": "Bundling laptop + software + access requests for a new employee onboarding.", "id": 47}, {"topic": "Service Catalog", "front": "What's a 'Variable' on a Catalog Item?", "back": "A custom input field on the request form, e.g. 'Laptop color'.", "id": 48}, {"topic": "Service Catalog", "front": "Does a Record Producer generate a REQ/RITM like a normal catalog item?", "back": "No — it bypasses REQ/RITM and creates a record directly in the target table.", "id": 49}, {"topic": "Service Catalog", "front": "Where would an end user go to browse and order catalog items?", "back": "The Self-Service Portal.", "id": 50}, {"topic": "Service Catalog", "front": "What's the purpose of Catalog Categories?", "back": "Organizing items into logical groups for easier browsing.", "id": 51}, {"topic": "Service Catalog", "front": "Scenario: IT wants users to submit Incidents via a friendlier catalog-style form. What should be used?", "back": "A Record Producer.", "id": 52}, {"topic": "Service Catalog", "front": "Scenario: New hires need a laptop, software, and email access all in one request. What feature handles this?", "back": "An Order Guide.", "id": 53}, {"topic": "Service Catalog", "front": "What does a Variable on a Catalog Item map to once the request is processed?", "back": "Typically a field on the resulting RITM or target record.", "id": 54}, {"topic": "Service Catalog", "front": "Can Catalog Items have approval workflows attached?", "back": "Yes — many catalog items require manager or other approvals before fulfillment proceeds.", "id": 55}, {"topic": "Service Catalog", "front": "Is a Catalog Item the same as a Knowledge Article?", "back": "No — a Catalog Item is requestable/orderable; a Knowledge Article is informational content.", "id": 56}, {"topic": "ACL & Security", "front": "What does ACL stand for?", "back": "Access Control List.", "id": 57}, {"topic": "ACL & Security", "front": "What four operations does CRUD represent?", "back": "Create, Read, Update, Delete.", "id": 58}, {"topic": "ACL & Security", "front": "How does ServiceNow evaluate multiple matching ACLs on the same operation?", "back": "All matching ACLs must pass — it's AND logic, not OR.", "id": 59}, {"topic": "ACL & Security", "front": "If a table-level ACL passes but a field-level ACL fails, can the user edit that field?", "back": "No — the field remains protected since both must pass for that field's update.", "id": 60}, {"topic": "ACL & Security", "front": "What happens if a user fails a Read ACL on a table?", "back": "They cannot view those records — they may appear missing entirely from lists.", "id": 61}, {"topic": "ACL & Security", "front": "Can an ACL have a condition script in addition to a role requirement?", "back": "Yes — ACLs can combine role requirements with scripted conditions.", "id": 62}, {"topic": "ACL & Security", "front": "What's the danger of believing 'any passing ACL grants access'?", "back": "It's incorrect — ALL applicable ACLs must pass; one failure blocks the operation.", "id": 63}, {"topic": "ACL & Security", "front": "Give an example of a field-level ACL.", "back": "Restricting Read access to the 'Salary' field to only HR roles.", "id": 64}, {"topic": "ACL & Security", "front": "Give an example of a table-level ACL.", "back": "Requiring the itil role to Create records on the Incident table.", "id": 65}, {"topic": "ACL & Security", "front": "What operation would protect against unauthorized record deletion?", "back": "A Delete ACL on that table.", "id": 66}, {"topic": "ACL & Security", "front": "Scenario: A user has itil but lacks approver_user, and a field requires approver_user to write. Can they edit that field?", "back": "No — they fail the field-level ACL despite passing the table-level one.", "id": 67}, {"topic": "ACL & Security", "front": "Do ACLs apply to forms only, or also to other access points like APIs?", "back": "ACLs apply broadly — to forms, lists, and other access paths into the data, including APIs.", "id": 68}, {"topic": "ACL & Security", "front": "Can an ACL deny access even to an admin?", "back": "Typically admin bypasses most ACLs, but highly restrictive custom ACLs theoretically could still apply depending on configuration.", "id": 69}, {"topic": "ACL & Security", "front": "What's the purpose of separating table-level and field-level ACLs?", "back": "Allowing broad table access while still protecting specific sensitive fields individually.", "id": 70}, {"topic": "ACL & Security", "front": "What does 'CRUD' help you remember when studying ACLs?", "back": "The four fundamental operations every ACL can govern.", "id": 71}, {"topic": "ACL & Security", "front": "Is ACL evaluation visible/editable by a basic end user?", "back": "No — ACL configuration is an administrative function, not user-facing.", "id": 72}, {"topic": "ACL & Security", "front": "Scenario: No ACL exists for Create on a custom table. What's the typical default behavior?", "back": "Default security behavior varies, but generally undefined/no ACL can default to restrictive access until configured — admins should always define ACLs for custom tables.", "id": 73}, {"topic": "ACL & Security", "front": "Why might a record appear in a list but some fields show blank/read-only?", "back": "Field-level ACLs may allow Read at the table level but restrict it differently per field.", "id": 74}, {"topic": "Update Sets", "front": "What is an Update Set?", "back": "A container that captures configuration changes for moving them between instances.", "id": 75}, {"topic": "Update Sets", "front": "Do Update Sets move transactional data like actual Incident records?", "back": "No — they move configuration/customization (metadata), not regular business data.", "id": 76}, {"topic": "Update Sets", "front": "What's the typical instance path for moving an Update Set?", "back": "Development → Test → Production.", "id": 77}, {"topic": "Update Sets", "front": "What does 'Preview' do to an Update Set?", "back": "It checks for conflicts/collisions with existing customizations — without applying any changes.", "id": 78}, {"topic": "Update Sets", "front": "What does 'Commit' do?", "back": "It actually applies the captured configuration changes to the target instance.", "id": 79}, {"topic": "Update Sets", "front": "What does 'Back Out' do?", "back": "It reverses a previously committed Update Set.", "id": 80}, {"topic": "Update Sets", "front": "Is Preview destructive (does it change anything)?", "back": "No — Preview is purely informational and non-destructive.", "id": 81}, {"topic": "Update Sets", "front": "What's the first step before making changes you want captured?", "back": "Set the desired Update Set as your 'Current' active Update Set.", "id": 82}, {"topic": "Update Sets", "front": "What happens automatically once an Update Set is current and you make config changes?", "back": "Those changes are automatically captured into that Update Set.", "id": 83}, {"topic": "Update Sets", "front": "What should you mark an Update Set as once you're done making changes?", "back": "Complete.", "id": 84}, {"topic": "Update Sets", "front": "What's the next step after marking an Update Set Complete in Dev?", "back": "Export/Retrieve it into the target instance (e.g., Test or Production).", "id": 85}, {"topic": "Update Sets", "front": "Scenario: A committed Update Set breaks a business rule in Production. What's the fastest fix?", "back": "Back Out the Update Set.", "id": 86}, {"topic": "Update Sets", "front": "What should always be done before Commit?", "back": "Preview, to check for collisions first.", "id": 87}, {"topic": "Update Sets", "front": "Can you delete an Update Set instead of backing it out to undo changes?", "back": "Deleting the Update Set record is different from Back Out — Back Out properly reverses applied changes; deleting alone doesn't undo them.", "id": 88}, {"topic": "Update Sets", "front": "What kind of changes get captured in an Update Set?", "back": "New fields, business rules, UI policies, ACLs, and other configuration/customization.", "id": 89}, {"topic": "Update Sets", "front": "If two developers modify the same business rule in different Update Sets, what might Preview flag?", "back": "A collision/conflict between the two customizations.", "id": 90}, {"topic": "Update Sets", "front": "Why shouldn't Update Sets be used to move actual Incident or User records?", "back": "They're designed for configuration/metadata only, not regular transactional data.", "id": 91}, {"topic": "Update Sets", "front": "What's the relationship between 'Retrieve' and 'Commit'?", "back": "Retrieve pulls the Update Set into the target instance; Commit then applies its changes.", "id": 92}, {"topic": "Reports", "front": "What's the difference between a Report and a Dashboard?", "back": "A Report is a single visualization; a Dashboard is a collection of multiple reports/widgets.", "id": 93}, {"topic": "Reports", "front": "Which chart type is best for showing a trend over time?", "back": "Line chart.", "id": 94}, {"topic": "Reports", "front": "Which chart type is best for showing proportions of a whole?", "back": "Pie chart.", "id": 95}, {"topic": "Reports", "front": "Which chart type is best for comparing discrete categories?", "back": "Bar chart.", "id": 96}, {"topic": "Reports", "front": "Which chart type cross-tabulates two dimensions in a grid?", "back": "Pivot chart/table.", "id": 97}, {"topic": "Reports", "front": "Scenario: A manager wants to see incident volume trend over 6 months. Which chart fits best?", "back": "Line chart — it's designed to show change over time.", "id": 98}, {"topic": "Reports", "front": "Scenario: A manager wants to compare incident counts per Assignment Group. Which chart fits best?", "back": "Bar chart — ideal for comparing distinct categories.", "id": 99}, {"topic": "Reports", "front": "Scenario: A manager wants the percentage breakdown of incidents by Priority. Which chart fits?", "back": "Pie chart — shows proportions of a whole.", "id": 100}, {"topic": "Reports", "front": "What's a Pivot table useful for that a simple Bar chart isn't?", "back": "Showing data across two dimensions simultaneously, e.g. Category by Priority.", "id": 101}, {"topic": "Reports", "front": "Can a Dashboard combine charts from multiple different tables?", "back": "Yes — dashboards aggregate various reports/widgets, which can pull from different sources.", "id": 102}, {"topic": "Reports", "front": "Is Performance Analytics the same tool as standard Reporting?", "back": "No — PA tracks indicators over time historically; standard Reports show current snapshots.", "id": 103}, {"topic": "Reports", "front": "What's an Indicator in Performance Analytics terms?", "back": "A specific metric tracked over time, e.g. '% incidents resolved within SLA'.", "id": 104}, {"topic": "Reports", "front": "What's a Widget in PA terms?", "back": "A visual display of one or more indicators, like a chart or scorecard.", "id": 105}, {"topic": "Flow Designer", "front": "What is Flow Designer?", "back": "A no-code/low-code visual tool for building process automation, replacing the legacy Workflow Editor.", "id": 106}, {"topic": "Flow Designer", "front": "What is a Trigger in Flow Designer?", "back": "The event that starts a flow — e.g., Record Created, Record Updated, Scheduled.", "id": 107}, {"topic": "Flow Designer", "front": "What is an Action in Flow Designer?", "back": "An individual step a flow performs, like Create Record or Send Notification.", "id": 108}, {"topic": "Flow Designer", "front": "What is a Subflow?", "back": "A reusable mini-flow that can be called from multiple parent flows.", "id": 109}, {"topic": "Flow Designer", "front": "Why use a Subflow instead of duplicating logic across flows?", "back": "To avoid maintaining the same logic in multiple places — build once, reuse everywhere.", "id": 110}, {"topic": "Flow Designer", "front": "Scenario: Three flows need identical approval-email logic. What should be built?", "back": "A Subflow containing that shared logic, called by all three flows.", "id": 111}, {"topic": "Flow Designer", "front": "What determines when a flow begins running?", "back": "Its Trigger.", "id": 112}, {"topic": "Flow Designer", "front": "Name three example Trigger types.", "back": "Record Created, Record Updated, Scheduled (also Service Catalog-based triggers).", "id": 113}, {"topic": "Flow Designer", "front": "What tool did Flow Designer replace as the modern recommended automation tool?", "back": "The legacy Workflow Editor.", "id": 114}, {"topic": "Flow Designer", "front": "Can a flow include conditional branching logic?", "back": "Yes — flows can include conditions and branching paths based on data.", "id": 115}, {"topic": "Flow Designer", "front": "What's an example Action that sends an email?", "back": "Send Notification.", "id": 116}, {"topic": "Flow Designer", "front": "What's an example Action that creates a new record?", "back": "Create Record.", "id": 117}, {"topic": "Flow Designer", "front": "Can a flow call another flow directly, or only a Subflow?", "back": "Flows specifically call Subflows for reusable shared logic.", "id": 118}, {"topic": "General CSA", "front": "What does SaaS stand for and mean?", "back": "Software as a Service — using ready-made applications without managing infrastructure or code.", "id": 119}, {"topic": "General CSA", "front": "What does PaaS stand for and mean?", "back": "Platform as a Service — building custom applications on top of a managed platform.", "id": 120}, {"topic": "General CSA", "front": "Is ServiceNow generally SaaS, PaaS, or both depending on use?", "back": "Both — SaaS when using out-of-box apps as-is, PaaS when building custom apps on the platform.", "id": 121}, {"topic": "General CSA", "front": "What is multi-instance architecture?", "back": "Each customer gets a dedicated, logically separate database — not shared multi-tenant data.", "id": 122}, {"topic": "General CSA", "front": "What is a Personal Developer Instance (PDI)?", "back": "A free individual ServiceNow sandbox used for learning and development.", "id": 123}, {"topic": "General CSA", "front": "Name the four standard instance types.", "back": "Personal Developer Instance, Development, Test, Production.", "id": 124}, {"topic": "General CSA", "front": "What's the purpose of a Test/QA instance?", "back": "Validating changes before they reach real end users in Production.", "id": 125}, {"topic": "General CSA", "front": "Why shouldn't admins build directly in Production?", "back": "To avoid introducing untested changes that could break the live system for real users.", "id": 126}, {"topic": "General CSA", "front": "What is the Application Navigator?", "back": "The sidebar listing accessible Applications and their Modules.", "id": 127}, {"topic": "General CSA", "front": "What's the difference between an Application and a Module in the navigator?", "back": "Application is the top-level grouping; Modules are individual links inside it.", "id": 128}, {"topic": "General CSA", "front": "What is the Filter Navigator?", "back": "The search box at the top of the Application Navigator for quickly finding modules.", "id": 129}, {"topic": "General CSA", "front": "What's the difference between History and Favorites?", "back": "History is automatically tracked recent records; Favorites are manually bookmarked by the user.", "id": 130}, {"topic": "General CSA", "front": "What's a Related List on a form?", "back": "A list at the bottom of a form showing records from a different table that reference the current one.", "id": 131}, {"topic": "General CSA", "front": "What does Personalize List affect?", "back": "Only the current user's own view — not a global change for everyone.", "id": 132}, {"topic": "General CSA", "front": "What does Configure Form Layout let you do?", "back": "Add, remove, and reorder fields and sections on a form.", "id": 133}, {"topic": "General CSA", "front": "What's a Section on a form used for?", "back": "Grouping related fields together visually, often collapsibly.", "id": 134}, {"topic": "General CSA", "front": "What is the Banner Frame?", "back": "The top bar present on every screen with logo, search, notifications, and the profile menu.", "id": 135}, {"topic": "General CSA", "front": "What's a String field?", "back": "A free-text, single-line field with a max character length.", "id": 136}, {"topic": "General CSA", "front": "What's an Integer field?", "back": "A field storing whole numbers only, no decimals.", "id": 137}, {"topic": "General CSA", "front": "What's a Choice field?", "back": "A dropdown of predefined values, each with a label and stored value.", "id": 138}, {"topic": "General CSA", "front": "What's a Reference field?", "back": "A field pointing to a record in another table, storing its sys_id but displaying a friendly value.", "id": 139}, {"topic": "General CSA", "front": "What's a Boolean field?", "back": "A true/false checkbox field.", "id": 140}, {"topic": "General CSA", "front": "What's the difference between Date and Date/Time fields?", "back": "Date stores only a calendar date; Date/Time stores date+time, adjusted to the viewer's time zone.", "id": 141}, {"topic": "General CSA", "front": "What's an HTML field?", "back": "A rich text field supporting formatting like bold and bullet points.", "id": 142}, {"topic": "General CSA", "front": "What's a Journal field, and what makes it unique?", "back": "An append-only field where new entries are added with timestamp/author; previous entries can't be edited or deleted.", "id": 143}, {"topic": "General CSA", "front": "What's a Knowledge Base?", "back": "A container for related Knowledge Articles, e.g. 'IT Knowledge Base'.", "id": 144}, {"topic": "General CSA", "front": "What's the typical Knowledge Article lifecycle?", "back": "Draft → Review → Published → Retired.", "id": 145}, {"topic": "General CSA", "front": "Can end users see Draft Knowledge Articles?", "back": "No — only Published articles are generally visible to end users.", "id": 146}, {"topic": "General CSA", "front": "What's the difference between retiring and deleting an article?", "back": "Retiring hides it while preserving the record/history; deleting removes it permanently.", "id": 147}, {"topic": "General CSA", "front": "What's a Data Source in the context of imports?", "back": "Defines where import data comes from, e.g. file upload, FTP, or JDBC connection.", "id": 148}, {"topic": "General CSA", "front": "What's an Import Set?", "back": "A staging table where raw imported data lands unmodified before transformation.", "id": 149}, {"topic": "General CSA", "front": "What's a Transform Map?", "back": "Rules mapping Import Set fields to target table fields, with optional transformation logic.", "id": 150}];
+
+function getKnown(){ try{ return JSON.parse(localStorage.getItem('csa_flashcard_known') || '{}'); }catch(e){ return {}; } }
+function saveKnown(k){ localStorage.setItem('csa_flashcard_known', JSON.stringify(k)); }
+
+let deck = [...ALL_CARDS];
+let currentIndex = 0;
+let isFlipped = false;
+let unknownOnly = false;
+
+function populateTopicFilter(){
+  const topics = [...new Set(ALL_CARDS.map(c=>c.topic))];
+  const sel = document.getElementById('topicFilter');
+  topics.forEach(t=>{
+    const count = ALL_CARDS.filter(c=>c.topic===t).length;
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = `${t} (${count})`;
+    sel.appendChild(opt);
+  });
+}
+
+function applyFilter(){
+  const val = document.getElementById('topicFilter').value;
+  const known = getKnown();
+  let base = val === 'all' ? [...ALL_CARDS] : ALL_CARDS.filter(c=>c.topic===val);
+  if(unknownOnly) base = base.filter(c=>!known[c.id]);
+  deck = base;
+  currentIndex = 0;
+  isFlipped = false;
+  renderCard();
+  renderGrid();
+  updateStats();
+}
+
+function toggleUnknownOnly(){
+  unknownOnly = !unknownOnly;
+  document.getElementById('unknownOnlyBtn').textContent = unknownOnly ? 'Showing only unknown' : 'Show only unknown';
+  document.getElementById('unknownOnlyBtn').classList.toggle('primary', unknownOnly);
+  applyFilter();
+}
+
+function shuffleDeck(){
+  for(let i=deck.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+  currentIndex = 0; isFlipped = false;
+  renderCard();
+}
+
+function resetKnown(){
+  if(!confirm('Reset all flashcard progress? This clears every "known" mark.')) return;
+  saveKnown({});
+  updateStats();
+  renderGrid();
+}
+
+function renderCard(){
+  const card = deck[currentIndex];
+  const cardEl = document.getElementById('fcCard');
+  cardEl.classList.remove('flipped');
+  isFlipped = false;
+  if(!card){
+    document.getElementById('cardFront').textContent = "No cards in this filter — nice work!";
+    document.getElementById('cardBack').textContent = "";
+    document.getElementById('cardCounter').textContent = "0 of 0";
+    return;
+  }
+  document.getElementById('cardFront').textContent = card.front;
+  document.getElementById('cardBack').textContent = card.back;
+  document.getElementById('cardTopic').textContent = card.topic;
+  document.getElementById('cardTopicBack').textContent = card.topic;
+  document.getElementById('cardCounter').textContent = `Card ${currentIndex+1} of ${deck.length}`;
+  document.getElementById('progressFill').style.width = `${((currentIndex+1)/deck.length)*100}%`;
+}
+
+function flipCard(){
+  if(deck.length === 0) return;
+  isFlipped = !isFlipped;
+  document.getElementById('fcCard').classList.toggle('flipped', isFlipped);
+}
+
+function nextCard(e){
+  if(e) e.stopPropagation();
+  if(deck.length === 0) return;
+  currentIndex = (currentIndex+1) % deck.length;
+  renderCard();
+}
+function prevCard(e){
+  if(e) e.stopPropagation();
+  if(deck.length === 0) return;
+  currentIndex = (currentIndex-1+deck.length) % deck.length;
+  renderCard();
+}
+
+function markCard(e, known){
+  e.stopPropagation();
+  if(deck.length === 0) return;
+  const card = deck[currentIndex];
+  const k = getKnown();
+  k[card.id] = known;
+  saveKnown(k);
+  updateStats();
+  renderGrid();
+  nextCard();
+}
+
+function updateStats(){
+  const known = getKnown();
+  const knownCount = Object.values(known).filter(Boolean).length;
+  document.getElementById('statTotal').textContent = ALL_CARDS.length;
+  document.getElementById('statKnown').textContent = knownCount;
+  document.getElementById('statRemaining').textContent = deck.length;
+  document.getElementById('progressPill').textContent = `${knownCount} / ${ALL_CARDS.length} known`;
+}
+
+function renderGrid(){
+  const known = getKnown();
+  const grid = document.getElementById('fcGrid');
+  grid.innerHTML = ALL_CARDS.map((c,i)=>{
+    const isKnown = known[c.id] ? 'known' : '';
+    return `<div class="fc-mini ${isKnown}" onclick="jumpToCard(${c.id})">${c.topic}<br><strong>#${c.id}</strong></div>`;
+  }).join('');
+}
+
+function jumpToCard(id){
+  const idx = deck.findIndex(c=>c.id===id);
+  if(idx === -1){
+    document.getElementById('topicFilter').value = 'all';
+    unknownOnly = false;
+    document.getElementById('unknownOnlyBtn').textContent = 'Show only unknown';
+    document.getElementById('unknownOnlyBtn').classList.remove('primary');
+    deck = [...ALL_CARDS];
+    currentIndex = ALL_CARDS.findIndex(c=>c.id===id);
+  } else {
+    currentIndex = idx;
+  }
+  renderCard();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* search (simple, searches front/back text) */
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+searchInput.addEventListener('input', function(){
+  const q = this.value.trim().toLowerCase();
+  if(q.length < 2){ searchResults.classList.remove('open'); return; }
+  const matches = ALL_CARDS.filter(c => c.front.toLowerCase().includes(q) || c.back.toLowerCase().includes(q)).slice(0,8);
+  if(matches.length === 0){ searchResults.innerHTML = '<div class="search-result-item">No results found.</div>'; searchResults.classList.add('open'); return; }
+  searchResults.innerHTML = matches.map(m => `<div class="search-result-item" onclick="jumpToCard(${m.id}); searchResults.classList.remove('open');"><span class="srt">${m.front}</span><span class="srm">${m.topic}</span></div>`).join('');
+  searchResults.classList.add('open');
+});
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.search-wrap')) searchResults.classList.remove('open');
+});
+
+window.addEventListener('DOMContentLoaded', function(){
+  populateTopicFilter();
+  renderCard();
+  renderGrid();
+  updateStats();
+});
+</script>
+</body>
+</html>

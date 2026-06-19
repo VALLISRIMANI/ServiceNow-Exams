@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | ServiceNow CSA Study Portal</title>
+<style>
+:root{
+  --bg:#FFFFFF; --bg-secondary:#F5F5F5; --card:#FFFFFF; --text:#1F2937; --text-muted:#6B7280;
+  --accent:#2C5282; --accent-soft:#EBF2FA; --border:#E5E7EB; --success:#2F855A; --danger:#C53030; --warning:#9C6F19;
+  --shadow:0 1px 3px rgba(0,0,0,0.06); --shadow-hover:0 4px 12px rgba(0,0,0,0.08);
+  --radius:10px; --sidebar-w:268px;
+}
+[data-theme="dark"]{
+  --bg:#0F1419; --bg-secondary:#161D26; --card:#1B232D; --text:#E5E9EE; --text-muted:#8B97A5;
+  --accent:#6FA8DC; --accent-soft:#1B2C3D; --border:#2B3641; --success:#48BB78; --danger:#F56565; --warning:#ECC94B;
+  --shadow:0 1px 3px rgba(0,0,0,0.3); --shadow-hover:0 4px 16px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.65; font-size:16px; transition:background .2s,color .2s;
+}
+h1,h2,h3,h4{font-family:Georgia,'Times New Roman',serif; font-weight:600; color:var(--text); line-height:1.3;}
+a{color:var(--accent); text-decoration:none;}
+a:hover{text-decoration:underline;}
+::selection{background:var(--accent-soft);}
+
+/* Layout */
+.app{display:flex; min-height:100vh;}
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; background:var(--bg-secondary); border-right:1px solid var(--border);
+  position:fixed; top:0; left:0; height:100vh; overflow-y:auto; padding:20px 0 40px; z-index:100;
+  transition:transform .25s ease;
+}
+.sidebar-brand{padding:0 20px 16px; border-bottom:1px solid var(--border); margin-bottom:14px;}
+.sidebar-brand .logo-row{display:flex; align-items:center; gap:10px;}
+.sidebar-brand .badge{width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Georgia,serif;font-size:15px;flex-shrink:0;}
+.sidebar-brand h1{font-size:16px; margin:0; line-height:1.25;}
+.sidebar-brand p{font-size:12px; color:var(--text-muted); margin:2px 0 0;}
+.nav-group{margin-bottom:6px;}
+.nav-group-label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:14px 20px 6px; font-weight:600;}
+.nav-link{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 20px; font-size:14px;
+  color:var(--text); border-left:3px solid transparent; cursor:pointer;
+}
+.nav-link:hover{background:var(--accent-soft); text-decoration:none;}
+.nav-link.active{border-left-color:var(--accent); background:var(--accent-soft); font-weight:600; color:var(--accent);}
+.nav-link .check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;}
+.nav-link .check.done{background:var(--success);border-color:var(--success);}
+.module-sub-list{display:none; flex-direction:column;}
+.module-sub-list.open{display:flex;}
+.module-sub-list a{padding:6px 20px 6px 40px; font-size:12.5px; color:var(--text-muted); display:block;}
+.module-sub-list a:hover{color:var(--accent);}
+
+.main{margin-left:var(--sidebar-w); flex:1; min-width:0;}
+.topbar{
+  position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; padding:12px 28px;
+}
+.search-wrap{flex:1; max-width:480px; position:relative;}
+.search-wrap input{
+  width:100%; padding:9px 14px 9px 34px; border-radius:8px; border:1px solid var(--border); background:var(--bg-secondary);
+  color:var(--text); font-size:14px;
+}
+.search-wrap input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.search-icon{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;}
+.search-results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; box-shadow:var(--shadow-hover); max-height:360px; overflow-y:auto; display:none; z-index:60;
+}
+.search-results.open{display:block;}
+.search-result-item{padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px;}
+.search-result-item:last-child{border-bottom:none;}
+.search-result-item:hover{background:var(--accent-soft);}
+.search-result-item .srt{font-weight:600; display:block; margin-bottom:2px;}
+.search-result-item .srm{color:var(--text-muted); display:block;}
+.topbar-right{display:flex; align-items:center; gap:10px; margin-left:auto;}
+.icon-btn{
+  width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+}
+.icon-btn:hover{background:var(--accent-soft);}
+.menu-toggle{display:none;}
+.progress-pill{
+  font-size:12.5px; padding:7px 12px; border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; white-space:nowrap;
+}
+
+.content{padding:32px 40px 80px; max-width:980px;}
+.page-header{margin-bottom:8px;}
+.page-header .eyebrow{font-size:12.5px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+.page-header h1{font-size:30px; margin:0 0 6px;}
+.page-header .sub{color:var(--text-muted); font-size:15px; max-width:680px;}
+
+.module{margin-top:56px; padding-top:8px; border-top:1px solid var(--border);}
+.module:first-of-type{border-top:none; margin-top:36px;}
+.module-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+.module-num{font-family:Georgia,serif; font-size:14px; color:var(--accent); font-weight:700;}
+.module h2{font-size:23px; margin:0;}
+.mark-done-btn{
+  margin-left:auto; font-size:12px; padding:6px 12px; border-radius:7px; border:1px solid var(--border); background:var(--card);
+  color:var(--text-muted); cursor:pointer; font-weight:600;
+}
+.mark-done-btn.done{background:var(--success); color:#fff; border-color:var(--success);}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin:18px 0; box-shadow:var(--shadow);}
+.card h3{font-size:17px; margin:0 0 10px;}
+.card h4{font-size:14.5px; margin:16px 0 6px;}
+.card p{margin:8px 0;}
+.card ul, .card ol{margin:8px 0; padding-left:22px;}
+.card li{margin:4px 0;}
+
+.example-box{
+  background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+.example-box strong{color:var(--accent);}
+.trick-box{
+  background:rgba(236,201,75,0.08); border-left:3px solid var(--warning); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .trick-box{background:rgba(236,201,75,0.06);}
+.trick-box strong{color:var(--warning);}
+.mistake-box{
+  background:rgba(197,48,48,0.06); border-left:3px solid var(--danger); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .mistake-box{background:rgba(245,101,101,0.06);}
+.mistake-box strong{color:var(--danger);}
+
+table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border);}
+th{background:var(--bg-secondary); font-weight:700; color:var(--text);}
+tr:hover{background:var(--bg-secondary);}
+
+.diagram{
+  background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:22px;
+  margin:16px 0; font-family:'SF Mono',Consolas,monospace; font-size:13px; overflow-x:auto;
+}
+.diagram pre{margin:0; white-space:pre;}
+.flow-svg{display:block; margin:16px auto; max-width:100%;}
+
+.tag{display:inline-block; font-size:11px; padding:3px 9px; border-radius:12px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin:2px 4px 2px 0;}
+
+.collapsible{border:1px solid var(--border); border-radius:8px; margin:12px 0; overflow:hidden;}
+.collapsible-head{
+  display:flex; justify-content:space-between; align-items:center; padding:12px 16px; cursor:pointer; background:var(--card); font-weight:600; font-size:14.5px;
+}
+.collapsible-head:hover{background:var(--bg-secondary);}
+.collapsible-head .arrow{transition:transform .2s; color:var(--text-muted); font-size:12px;}
+.collapsible.open .collapsible-head .arrow{transform:rotate(90deg);}
+.collapsible-body{display:none; padding:0 16px 16px; font-size:14.5px;}
+.collapsible.open .collapsible-body{display:block;}
+
+.exam-q{background:var(--bg-secondary); border-radius:8px; padding:14px 16px; margin:12px 0; font-size:14px;}
+.exam-q .q-label{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;}
+.exam-q .q-answer{margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); color:var(--text-muted); font-size:13.5px;}
+
+.concept-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0;}
+@media (max-width:700px){.concept-grid{grid-template-columns:1fr;}}
+.concept-card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.concept-card .cnum{font-size:11px; color:var(--accent); font-weight:700;}
+.concept-card h4{margin:4px 0 8px; font-size:15px;}
+.concept-card .clabel{font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-top:8px;}
+.concept-card .ctext{font-size:13.5px; margin:2px 0 0;}
+
+.bottom-nav{display:flex; justify-content:space-between; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); gap:12px;}
+.bottom-nav a{
+  flex:1; padding:14px 18px; border:1px solid var(--border); border-radius:8px; font-size:14px; color:var(--text);
+  display:flex; flex-direction:column; gap:2px;
+}
+.bottom-nav a:hover{background:var(--accent-soft); text-decoration:none;}
+.bottom-nav .lbl{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;}
+.bottom-nav .next-link{text-align:right;}
+
+@media (max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0); box-shadow:4px 0 20px rgba(0,0,0,0.2);}
+  .main{margin-left:0;}
+  .menu-toggle{display:flex;}
+  .content{padding:24px 18px 60px;}
+  .concept-grid{grid-template-columns:1fr;}
+  .search-wrap{max-width:none;}
+  .progress-pill{display:none;}
+}
+.overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90;}
+.overlay.open{display:block;}
+
+.dash-hero{background:var(--bg-secondary); border:1px solid var(--border); border-radius:14px; padding:36px 32px; margin-bottom:28px;}
+.dash-hero h1{font-size:28px; margin:0 0 8px;}
+.dash-hero p{color:var(--text-muted); max-width:600px; margin:0 0 18px; font-size:15px;}
+.dash-cta-row{display:flex; gap:12px; flex-wrap:wrap;}
+.dash-cta{padding:11px 20px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block;}
+.dash-cta.primary{background:var(--accent); color:#fff;}
+.dash-cta.secondary{background:var(--card); color:var(--text); border:1px solid var(--border);}
+.dash-cta:hover{opacity:.92; text-decoration:none;}
+.dash-stats-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:30px;}
+@media (max-width:768px){.dash-stats-row{grid-template-columns:repeat(2,1fr);}}
+.dash-stat-card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; box-shadow:var(--shadow);}
+.dash-stat-card .num{font-size:26px; font-weight:700; font-family:Georgia,serif; color:var(--accent);}
+.dash-stat-card .lbl{font-size:12.5px; color:var(--text-muted); margin-top:2px;}
+.dash-section-title{font-size:18px; margin:30px 0 14px;}
+.dash-module-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+@media (max-width:768px){.dash-module-grid{grid-template-columns:1fr;}}
+.dash-module-card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text);}
+.dash-module-card:hover{background:var(--accent-soft); text-decoration:none;}
+.dash-module-card .modnum{width:32px; height:32px; border-radius:8px; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0;}
+.dash-module-card.done .modnum{background:var(--success); color:#fff;}
+.dash-module-card .modtitle{font-size:14px; font-weight:600; flex:1;}
+.dash-module-card .modcheck{font-size:12px; color:var(--text-muted);}
+.dash-practice-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:10px;}
+@media (max-width:768px){.dash-practice-grid{grid-template-columns:repeat(2,1fr);}}
+.dash-practice-card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; text-decoration:none; color:var(--text); display:flex; flex-direction:column; gap:6px;}
+.dash-practice-card:hover{background:var(--accent-soft); text-decoration:none;}
+.dash-practice-card .ptitle{font-weight:700; font-size:14.5px;}
+.dash-practice-card .pmeta{font-size:12px; color:var(--text-muted);}
+.dash-practice-card .pscore{margin-top:6px; font-size:13px; font-weight:700; color:var(--accent);}
+
+</style>
+</head>
+<body>
+<div class="app">
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-row">
+      <div class="badge">SN</div>
+      <div>
+        <h1>CSA Study Portal</h1>
+        <p>Certified System Administrator</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-group">
+    <a class="nav-link active" href="index.html"><span>Dashboard</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Theory — 16 Modules</div>
+    <div id="module-nav-list"></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Practice</div>
+    <a class="nav-link" href="flashcards.html"><span>Flashcards (150)</span></a>
+    <a class="nav-link" href="mocktest1.html"><span>Mock Test 1</span></a>
+    <a class="nav-link" href="mocktest2.html"><span>Mock Test 2</span></a>
+    <a class="nav-link" href="mocktest3.html"><span>Mock Test 3</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Revision</div>
+    <a class="nav-link" href="revision.html"><span>Rapid Revision & Exam Guide</span></a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search the theory guide..." autocomplete="off">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="dash-hero">
+      <h1>ServiceNow CSA Study Portal</h1>
+      <p>Everything you need to pass the Certified System Administrator exam: complete theory across 16 modules, 150 flashcards, 3 full-length 60-question mock tests with instant scoring, and a rapid revision guide. Your progress is saved automatically on this device.</p>
+      <div class="dash-cta-row">
+        <a class="dash-cta primary" href="theory.html">Start studying →</a>
+        <a class="dash-cta secondary" href="mocktest1.html">Take a mock test</a>
+      </div>
+    </div>
+
+    <div class="dash-stats-row">
+      <div class="dash-stat-card"><div class="num" id="statModules">0/16</div><div class="lbl">Theory modules completed</div></div>
+      <div class="dash-stat-card"><div class="num" id="statFlashcards">0/150</div><div class="lbl">Flashcards marked known</div></div>
+      <div class="dash-stat-card"><div class="num" id="statBestScore">—</div><div class="lbl">Best mock test score</div></div>
+      <div class="dash-stat-card"><div class="num" id="statTestsDone">0/3</div><div class="lbl">Mock tests attempted</div></div>
+    </div>
+
+    <h2 class="dash-section-title">Theory Modules</h2>
+    <div class="dash-module-grid" id="moduleGrid"></div>
+
+    <h2 class="dash-section-title">Practice</h2>
+    <div class="dash-practice-grid">
+      <a class="dash-practice-card" href="flashcards.html">
+        <span class="ptitle">Flashcards</span>
+        <span class="pmeta">150 cards across 8 topics</span>
+        <span class="pscore" id="fcScoreNote">0 known</span>
+      </a>
+      <a class="dash-practice-card" href="mocktest1.html">
+        <span class="ptitle">Mock Test 1</span>
+        <span class="pmeta">60 questions · instant scoring</span>
+        <span class="pscore" id="mt1ScoreNote">Not attempted</span>
+      </a>
+      <a class="dash-practice-card" href="mocktest2.html">
+        <span class="ptitle">Mock Test 2</span>
+        <span class="pmeta">60 questions · instant scoring</span>
+        <span class="pscore" id="mt2ScoreNote">Not attempted</span>
+      </a>
+      <a class="dash-practice-card" href="mocktest3.html">
+        <span class="ptitle">Mock Test 3</span>
+        <span class="pmeta">60 questions · instant scoring</span>
+        <span class="pscore" id="mt3ScoreNote">Not attempted</span>
+      </a>
+    </div>
+
+    <h2 class="dash-section-title">Revision</h2>
+    <div class="dash-practice-grid" style="grid-template-columns:1fr;">
+      <a class="dash-practice-card" href="revision.html">
+        <span class="ptitle">Rapid Revision & Exam Success Guide</span>
+        <span class="pmeta">1-day, 2-hour, and 30-minute sheets, plus exam-day strategy</span>
+      </a>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('csa_theme', t);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(cur);
+}
+applyTheme(localStorage.getItem('csa_theme') || 'light');
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+
+const MODULE_TITLES = [
+  "Platform Overview","User Interface","Users, Groups & Roles","Tables & Databases",
+  "Forms & Lists","Dictionary & Fields","Service Catalog","Knowledge Management",
+  "Flow Designer","Reporting","Importing Data","Update Sets","Security (ACL)",
+  "Notifications","Performance Analytics Basics","Exam-Critical Concepts (Top 60)"
+];
+function getProgress(){ try{ return JSON.parse(localStorage.getItem('csa_progress_modules') || '{}'); }catch(e){ return {}; } }
+function buildModuleNav(){
+  const list = document.getElementById('module-nav-list');
+  const progress = getProgress();
+  let html = '';
+  MODULE_TITLES.forEach((title, i)=>{
+    const n = i+1;
+    const done = progress['m'+n] ? 'done' : '';
+    html += `<a class="nav-link" href="theory.html#module-${n}"><span>${n}. ${title}</span><span class="check ${done}"></span></a>`;
+  });
+  list.innerHTML = html;
+}
+buildModuleNav();
+
+function getKnown(){ try{ return JSON.parse(localStorage.getItem('csa_flashcard_known') || '{}'); }catch(e){ return {}; } }
+function getScores(){ try{ return JSON.parse(localStorage.getItem('csa_mocktest_scores') || '{}'); }catch(e){ return {}; } }
+
+function renderDashboard(){
+  const progress = getProgress();
+  const doneCount = Object.values(progress).filter(Boolean).length;
+  document.getElementById('statModules').textContent = `${doneCount}/16`;
+
+  const known = getKnown();
+  const knownCount = Object.values(known).filter(Boolean).length;
+  document.getElementById('statFlashcards').textContent = `${knownCount}/150`;
+  document.getElementById('fcScoreNote').textContent = `${knownCount} known`;
+
+  const scores = getScores();
+  const testKeys = ['test1','test2','test3'];
+  let attempted = 0;
+  let best = null;
+  testKeys.forEach((k,i)=>{
+    const el = document.getElementById('mt'+(i+1)+'ScoreNote');
+    if(scores[k]){
+      attempted++;
+      el.textContent = `Best: ${scores[k].correct}/${scores[k].total} (${scores[k].score}%)`;
+      if(best === null || scores[k].score > best) best = scores[k].score;
+    }
+  });
+  document.getElementById('statTestsDone').textContent = `${attempted}/3`;
+  document.getElementById('statBestScore').textContent = best !== null ? `${best}%` : '—';
+
+  const grid = document.getElementById('moduleGrid');
+  grid.innerHTML = MODULE_TITLES.map((title,i)=>{
+    const n = i+1;
+    const done = progress['m'+n];
+    return `<a class="dash-module-card ${done?'done':''}" href="theory.html#module-${n}">
+      <span class="modnum">${done ? '✓' : n}</span>
+      <span class="modtitle">${title}</span>
+      <span class="modcheck">${done ? 'Completed' : 'Module '+n}</span>
+    </a>`;
+  }).join('');
+}
+renderDashboard();
+
+/* basic search redirecting to theory page */
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && this.value.trim().length > 0){
+    window.location.href = 'theory.html';
+  }
+});
+</script>
+</body>
+</html>

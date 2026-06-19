@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Test 3 | ServiceNow CSA Study Portal</title>
+<style>
+:root{
+  --bg:#FFFFFF; --bg-secondary:#F5F5F5; --card:#FFFFFF; --text:#1F2937; --text-muted:#6B7280;
+  --accent:#2C5282; --accent-soft:#EBF2FA; --border:#E5E7EB; --success:#2F855A; --danger:#C53030; --warning:#9C6F19;
+  --shadow:0 1px 3px rgba(0,0,0,0.06); --shadow-hover:0 4px 12px rgba(0,0,0,0.08);
+  --radius:10px; --sidebar-w:268px;
+}
+[data-theme="dark"]{
+  --bg:#0F1419; --bg-secondary:#161D26; --card:#1B232D; --text:#E5E9EE; --text-muted:#8B97A5;
+  --accent:#6FA8DC; --accent-soft:#1B2C3D; --border:#2B3641; --success:#48BB78; --danger:#F56565; --warning:#ECC94B;
+  --shadow:0 1px 3px rgba(0,0,0,0.3); --shadow-hover:0 4px 16px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.65; font-size:16px; transition:background .2s,color .2s;
+}
+h1,h2,h3,h4{font-family:Georgia,'Times New Roman',serif; font-weight:600; color:var(--text); line-height:1.3;}
+a{color:var(--accent); text-decoration:none;}
+a:hover{text-decoration:underline;}
+::selection{background:var(--accent-soft);}
+
+/* Layout */
+.app{display:flex; min-height:100vh;}
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; background:var(--bg-secondary); border-right:1px solid var(--border);
+  position:fixed; top:0; left:0; height:100vh; overflow-y:auto; padding:20px 0 40px; z-index:100;
+  transition:transform .25s ease;
+}
+.sidebar-brand{padding:0 20px 16px; border-bottom:1px solid var(--border); margin-bottom:14px;}
+.sidebar-brand .logo-row{display:flex; align-items:center; gap:10px;}
+.sidebar-brand .badge{width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Georgia,serif;font-size:15px;flex-shrink:0;}
+.sidebar-brand h1{font-size:16px; margin:0; line-height:1.25;}
+.sidebar-brand p{font-size:12px; color:var(--text-muted); margin:2px 0 0;}
+.nav-group{margin-bottom:6px;}
+.nav-group-label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:14px 20px 6px; font-weight:600;}
+.nav-link{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 20px; font-size:14px;
+  color:var(--text); border-left:3px solid transparent; cursor:pointer;
+}
+.nav-link:hover{background:var(--accent-soft); text-decoration:none;}
+.nav-link.active{border-left-color:var(--accent); background:var(--accent-soft); font-weight:600; color:var(--accent);}
+.nav-link .check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;}
+.nav-link .check.done{background:var(--success);border-color:var(--success);}
+.module-sub-list{display:none; flex-direction:column;}
+.module-sub-list.open{display:flex;}
+.module-sub-list a{padding:6px 20px 6px 40px; font-size:12.5px; color:var(--text-muted); display:block;}
+.module-sub-list a:hover{color:var(--accent);}
+
+.main{margin-left:var(--sidebar-w); flex:1; min-width:0;}
+.topbar{
+  position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; padding:12px 28px;
+}
+.search-wrap{flex:1; max-width:480px; position:relative;}
+.search-wrap input{
+  width:100%; padding:9px 14px 9px 34px; border-radius:8px; border:1px solid var(--border); background:var(--bg-secondary);
+  color:var(--text); font-size:14px;
+}
+.search-wrap input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.search-icon{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;}
+.search-results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; box-shadow:var(--shadow-hover); max-height:360px; overflow-y:auto; display:none; z-index:60;
+}
+.search-results.open{display:block;}
+.search-result-item{padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px;}
+.search-result-item:last-child{border-bottom:none;}
+.search-result-item:hover{background:var(--accent-soft);}
+.search-result-item .srt{font-weight:600; display:block; margin-bottom:2px;}
+.search-result-item .srm{color:var(--text-muted); display:block;}
+.topbar-right{display:flex; align-items:center; gap:10px; margin-left:auto;}
+.icon-btn{
+  width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+}
+.icon-btn:hover{background:var(--accent-soft);}
+.menu-toggle{display:none;}
+.progress-pill{
+  font-size:12.5px; padding:7px 12px; border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; white-space:nowrap;
+}
+
+.content{padding:32px 40px 80px; max-width:980px;}
+.page-header{margin-bottom:8px;}
+.page-header .eyebrow{font-size:12.5px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+.page-header h1{font-size:30px; margin:0 0 6px;}
+.page-header .sub{color:var(--text-muted); font-size:15px; max-width:680px;}
+
+.module{margin-top:56px; padding-top:8px; border-top:1px solid var(--border);}
+.module:first-of-type{border-top:none; margin-top:36px;}
+.module-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+.module-num{font-family:Georgia,serif; font-size:14px; color:var(--accent); font-weight:700;}
+.module h2{font-size:23px; margin:0;}
+.mark-done-btn{
+  margin-left:auto; font-size:12px; padding:6px 12px; border-radius:7px; border:1px solid var(--border); background:var(--card);
+  color:var(--text-muted); cursor:pointer; font-weight:600;
+}
+.mark-done-btn.done{background:var(--success); color:#fff; border-color:var(--success);}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin:18px 0; box-shadow:var(--shadow);}
+.card h3{font-size:17px; margin:0 0 10px;}
+.card h4{font-size:14.5px; margin:16px 0 6px;}
+.card p{margin:8px 0;}
+.card ul, .card ol{margin:8px 0; padding-left:22px;}
+.card li{margin:4px 0;}
+
+.example-box{
+  background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+.example-box strong{color:var(--accent);}
+.trick-box{
+  background:rgba(236,201,75,0.08); border-left:3px solid var(--warning); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .trick-box{background:rgba(236,201,75,0.06);}
+.trick-box strong{color:var(--warning);}
+.mistake-box{
+  background:rgba(197,48,48,0.06); border-left:3px solid var(--danger); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .mistake-box{background:rgba(245,101,101,0.06);}
+.mistake-box strong{color:var(--danger);}
+
+table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border);}
+th{background:var(--bg-secondary); font-weight:700; color:var(--text);}
+tr:hover{background:var(--bg-secondary);}
+
+.diagram{
+  background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:22px;
+  margin:16px 0; font-family:'SF Mono',Consolas,monospace; font-size:13px; overflow-x:auto;
+}
+.diagram pre{margin:0; white-space:pre;}
+.flow-svg{display:block; margin:16px auto; max-width:100%;}
+
+.tag{display:inline-block; font-size:11px; padding:3px 9px; border-radius:12px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin:2px 4px 2px 0;}
+
+.collapsible{border:1px solid var(--border); border-radius:8px; margin:12px 0; overflow:hidden;}
+.collapsible-head{
+  display:flex; justify-content:space-between; align-items:center; padding:12px 16px; cursor:pointer; background:var(--card); font-weight:600; font-size:14.5px;
+}
+.collapsible-head:hover{background:var(--bg-secondary);}
+.collapsible-head .arrow{transition:transform .2s; color:var(--text-muted); font-size:12px;}
+.collapsible.open .collapsible-head .arrow{transform:rotate(90deg);}
+.collapsible-body{display:none; padding:0 16px 16px; font-size:14.5px;}
+.collapsible.open .collapsible-body{display:block;}
+
+.exam-q{background:var(--bg-secondary); border-radius:8px; padding:14px 16px; margin:12px 0; font-size:14px;}
+.exam-q .q-label{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;}
+.exam-q .q-answer{margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); color:var(--text-muted); font-size:13.5px;}
+
+.concept-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0;}
+@media (max-width:700px){.concept-grid{grid-template-columns:1fr;}}
+.concept-card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.concept-card .cnum{font-size:11px; color:var(--accent); font-weight:700;}
+.concept-card h4{margin:4px 0 8px; font-size:15px;}
+.concept-card .clabel{font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-top:8px;}
+.concept-card .ctext{font-size:13.5px; margin:2px 0 0;}
+
+.bottom-nav{display:flex; justify-content:space-between; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); gap:12px;}
+.bottom-nav a{
+  flex:1; padding:14px 18px; border:1px solid var(--border); border-radius:8px; font-size:14px; color:var(--text);
+  display:flex; flex-direction:column; gap:2px;
+}
+.bottom-nav a:hover{background:var(--accent-soft); text-decoration:none;}
+.bottom-nav .lbl{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;}
+.bottom-nav .next-link{text-align:right;}
+
+@media (max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0); box-shadow:4px 0 20px rgba(0,0,0,0.2);}
+  .main{margin-left:0;}
+  .menu-toggle{display:flex;}
+  .content{padding:24px 18px 60px;}
+  .concept-grid{grid-template-columns:1fr;}
+  .search-wrap{max-width:none;}
+  .progress-pill{display:none;}
+}
+.overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90;}
+.overlay.open{display:block;}
+
+.mt-intro{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin:18px 0;}
+.mt-intro ul{margin:10px 0; padding-left:22px;}
+.mt-startbtn{margin-top:14px; padding:12px 26px; border-radius:8px; border:none; background:var(--accent); color:#fff; font-size:15px; font-weight:700; cursor:pointer;}
+.mt-startbtn:hover{opacity:.9;}
+.mt-progress-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+.mt-progress-bar{flex:1; height:8px; background:var(--bg-secondary); border-radius:4px; overflow:hidden; min-width:160px;}
+.mt-progress-fill{height:100%; background:var(--accent); transition:width .2s;}
+.mt-timer{font-family:'SF Mono',Consolas,monospace; font-size:14px; color:var(--text-muted);}
+.mt-qcard{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin:16px 0; box-shadow:var(--shadow);}
+.mt-qnum{font-size:12px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:8px;}
+.mt-qtext{font-size:17px; font-weight:600; margin-bottom:16px; line-height:1.5;}
+.mt-opt{display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid var(--border); border-radius:8px; margin-bottom:9px; cursor:pointer; font-size:14.5px;}
+.mt-opt:hover{background:var(--accent-soft);}
+.mt-opt input{margin-top:3px;}
+.mt-opt.selected{border-color:var(--accent); background:var(--accent-soft);}
+.mt-opt.correct-answer{border-color:var(--success); background:rgba(47,133,90,0.08);}
+.mt-opt.wrong-answer{border-color:var(--danger); background:rgba(197,48,48,0.08);}
+.mt-explanation{margin-top:12px; padding:12px 14px; background:var(--bg-secondary); border-radius:8px; font-size:13.5px; color:var(--text-muted); display:none;}
+.mt-explanation.shown{display:block;}
+.mt-nav-buttons{display:flex; justify-content:space-between; margin-top:20px; gap:10px;}
+.mt-nav-buttons button{padding:10px 20px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; font-weight:600; font-size:14px;}
+.mt-nav-buttons button:hover{background:var(--accent-soft);}
+.mt-nav-buttons button.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+.mt-jumpgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:6px; margin:16px 0;}
+.mt-jump{width:38px;height:38px;border-radius:7px;border:1px solid var(--border);background:var(--card);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;}
+.mt-jump.answered{background:var(--accent-soft); border-color:var(--accent); color:var(--accent);}
+.mt-jump.current{box-shadow:0 0 0 2px var(--accent);}
+.mt-results{text-align:center; padding:40px 20px;}
+.mt-score-circle{width:160px;height:160px;border-radius:50%;border:8px solid var(--accent); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 24px;}
+.mt-score-circle .pct{font-size:34px; font-weight:700; font-family:Georgia,serif;}
+.mt-score-circle .lbl{font-size:12px; color:var(--text-muted);}
+.mt-result-breakdown{display:flex; gap:20px; justify-content:center; margin:20px 0; flex-wrap:wrap;}
+.mt-result-stat{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px 22px; min-width:110px;}
+.mt-result-stat b{font-size:22px; display:block; font-family:Georgia,serif;}
+.mt-review-item{text-align:left; margin:14px 0;}
+
+</style>
+</head>
+<body>
+<div class="app">
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-row">
+      <div class="badge">SN</div>
+      <div>
+        <h1>CSA Study Portal</h1>
+        <p>Certified System Administrator</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-group">
+    <a class="nav-link" href="index.html"><span>Dashboard</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Theory — 16 Modules</div>
+    <div id="module-nav-list"></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Practice</div>
+    <a class="nav-link" href="flashcards.html"><span>Flashcards (150)</span></a>
+    <a class="nav-link" href="mocktest1.html"><span>Mock Test 1</span></a>
+    <a class="nav-link" href="mocktest2.html"><span>Mock Test 2</span></a>
+    <a class="nav-link" href="mocktest3.html"><span>Mock Test 3</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Revision</div>
+    <a class="nav-link" href="revision.html"><span>Rapid Revision & Exam Guide</span></a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+    <div class="search-wrap" style="visibility:hidden;"></div>
+    <div class="topbar-right">
+      <span class="progress-pill" id="progressPill">Mock Test 3</span>
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="eyebrow">Timed Practice Exam</div>
+      <h1>Mock Test 3</h1>
+      <p class="sub">60 CSA-difficulty questions mixing theory, scenarios, practical configuration, and UI navigation. Instant scoring with a full explanation for every answer.</p>
+    </div>
+
+    <div id="mt-intro" class="mt-intro">
+      <h3 style="margin-top:0;">Before you start</h3>
+      <ul>
+        <li>60 multiple-choice questions, one correct answer each.</li>
+        <li>You can move freely between questions before submitting.</li>
+        <li>Your score and a full explanation per question appear immediately after submission.</li>
+        <li>Your best score on this test is saved automatically on this device.</li>
+      </ul>
+      <button class="mt-startbtn" onclick="startTest()">Start Mock Test 3</button>
+      <div id="bestScoreNote" style="margin-top:10px; font-size:13px; color:var(--text-muted);"></div>
+    </div>
+
+    <div id="mt-test" style="display:none;">
+      <div class="mt-progress-row">
+        <div class="mt-progress-bar"><div class="mt-progress-fill" id="mtProgressFill" style="width:0%"></div></div>
+        <span class="mt-timer" id="mtCounter">0 / 60 answered</span>
+      </div>
+      <div class="mt-jumpgrid" id="mtJumpGrid"></div>
+
+      <div class="mt-qcard" id="mtQuestionCard"></div>
+
+      <div class="mt-nav-buttons">
+        <button onclick="mtPrev()">← Previous</button>
+        <button id="mtNextBtn" onclick="mtNext()">Next →</button>
+        <button class="primary" id="mtSubmitBtn" onclick="submitTest()" style="display:none;">Submit Test</button>
+      </div>
+    </div>
+
+    <div id="mt-results" style="display:none;"></div>
+
+    <div class="bottom-nav">
+      <a href="flashcards.html"><span class="lbl">Back to</span><span>Flashcards</span></a>
+      <a href="revision.html" class="next-link"><span class="lbl">Next</span><span>Rapid Revision →</span></a>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('csa_theme', t);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(cur);
+}
+applyTheme(localStorage.getItem('csa_theme') || 'light');
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+
+const MODULE_TITLES = [
+  "Platform Overview","User Interface","Users, Groups & Roles","Tables & Databases",
+  "Forms & Lists","Dictionary & Fields","Service Catalog","Knowledge Management",
+  "Flow Designer","Reporting","Importing Data","Update Sets","Security (ACL)",
+  "Notifications","Performance Analytics Basics","Exam-Critical Concepts (Top 60)"
+];
+function getProgress(){ try{ return JSON.parse(localStorage.getItem('csa_progress_modules') || '{}'); }catch(e){ return {}; } }
+function buildModuleNav(){
+  const list = document.getElementById('module-nav-list');
+  const progress = getProgress();
+  let html = '';
+  MODULE_TITLES.forEach((title, i)=>{
+    const n = i+1;
+    const done = progress['m'+n] ? 'done' : '';
+    html += `<a class="nav-link" href="theory.html#module-${n}"><span>${n}. ${title}</span><span class="check ${done}"></span></a>`;
+  });
+  list.innerHTML = html;
+}
+buildModuleNav();
+
+const TEST_NUM = 3;
+const QUESTIONS = [{"q": "What's the core architectural reason ServiceNow can run many different applications (ITSM, HR, CSM) on one platform?", "opts": ["Each application has its own separate database engine", "All applications share the same underlying database, UI engine, and security model", "Applications are licensed separately with no shared code", "Each application runs on a different server entirely"], "correct": 1, "exp": "ServiceNow's single-platform design means every application shares the same Glide engine, database, and security model."}, {"q": "What's a key risk of building and testing directly in Production?", "opts": ["There is no risk; it's standard practice", "Untested changes could break the live system actively used by real end users", "Production instances reject all configuration changes", "It would void the support contract automatically"], "correct": 1, "exp": "Production is live; untested changes risk breaking real, in-use functionality for actual users."}, {"q": "Why does ServiceNow push platform upgrades to all instances rather than letting customers choose to skip them?", "opts": ["To intentionally break custom configurations", "To keep all customers on a consistent, supported platform version (though customers can typically schedule upgrade timing)", "Because customers pay extra to upgrade", "Upgrades are entirely optional and rarely applied"], "correct": 1, "exp": "ServiceNow's twice-yearly release model keeps the platform consistent, though customers usually have some control over scheduling."}, {"q": "What kind of access does a Personal Developer Instance grant?", "opts": ["Access to a shared company production database", "A free, individual sandbox instance for learning/dev separate from any company pipeline", "Read-only access to ServiceNow's own internal instance", "Temporary access expiring after 24 hours"], "correct": 1, "exp": "PDIs are individual, free sandboxes used for learning ServiceNow, unrelated to any specific company's instance pipeline."}, {"q": "Which UI element is used to log out or switch personal settings like theme?", "opts": ["Application Navigator", "Profile menu in the Banner Frame", "Related List", "Filter Navigator"], "correct": 1, "exp": "The Banner Frame's profile menu typically provides logout and personal settings options."}, {"q": "What's the difference between an Application and a Module in the navigator?", "opts": ["No difference", "Application is the top-level grouping; Modules are individual links inside it", "Modules contain multiple Applications", "Applications only exist for ITSM"], "correct": 1, "exp": "Applications are top-level groupings (e.g., 'Incident'); Modules are specific links within them (e.g., 'Open,' 'Create New')."}, {"q": "A manager wants to see the 5 most recently opened Incident records without manually saving them. What should they check?", "opts": ["Favorites", "History", "Personalize List", "Filter Navigator"], "correct": 1, "exp": "History automatically tracks recently visited records without requiring manual bookmarking."}, {"q": "What's the function of a Related List on an Incident form showing linked Configuration Items?", "opts": ["It edits the CI's own form layout", "It displays CI records (from a different table) linked to the current Incident", "It deletes unrelated CIs", "It changes the Incident's table structure"], "correct": 1, "exp": "Related Lists surface records from another table that reference the current record, without altering either table's structure."}, {"q": "What feature would a help desk admin use to make 'Category' and 'Subcategory' appear next to each other on the Incident form?", "opts": ["Personalize List", "Configure Form Layout", "Filter Navigator", "Knowledge Base settings"], "correct": 1, "exp": "Configure Form Layout lets admins reposition and organize fields on a form."}, {"q": "What's true about Personalize List changes made by a regular end user?", "opts": ["They apply globally to all users", "They apply only to that individual user's own view", "They require admin approval first", "They permanently alter the underlying table schema"], "correct": 1, "exp": "Personalize List is a personal customization, not a global change for all users."}, {"q": "Scenario: Maria is a member of two groups — 'Service Desk' (with itil role) and 'Catalog Admins' (with catalog_admin role). What access does she have?", "opts": ["Only itil, since groups can't stack roles", "Both itil and catalog_admin, since her access is the union of all her group roles", "Neither, since she's in two groups", "Only catalog_admin, which always overrides itil"], "correct": 1, "exp": "A user's effective roles are the union of all roles from every group they belong to, plus any directly assigned roles."}, {"q": "What happens if an admin deletes a Group entirely that had a role assigned?", "opts": ["Members keep the role forever regardless", "Members lose that role unless they have it through another source (direct assignment or another group)", "The role itself gets deleted from the system", "Nothing changes for any user"], "correct": 1, "exp": "Removing the group removes that source of the role; members only retain it if they have it via another path."}, {"q": "Which is more scalable for managing access for a growing support team: assigning roles to individuals or to a group?", "opts": ["Individuals — more precise control always wins", "Groups — adding/removing membership is far easier to maintain at scale", "Both are equally scalable", "Roles can't be assigned to groups"], "correct": 1, "exp": "Group-based role assignment scales much better than maintaining individual role assignments as a team grows or changes."}, {"q": "What's the relationship between the 'admin' role and other roles?", "opts": ["admin needs every other role explicitly listed as contained", "admin implicitly has access to essentially everything in the system", "admin is identical to itil", "admin only works for Catalog Items"], "correct": 1, "exp": "The admin role implicitly grants full system access without needing every other role explicitly assigned."}, {"q": "Why is it useful that Incident, Problem, and Change Request all extend the Task table?", "opts": ["It prevents any reporting across these tables", "Shared fields and logic (like priority handling) apply consistently across all three without duplication", "It makes each table completely independent", "It disables ACLs on child tables"], "correct": 1, "exp": "Table extension lets shared structure and logic defined once on Task apply automatically across all extending tables."}, {"q": "What does it mean if Incident is described as a 'child table' of Task?", "opts": ["Incident has fewer fields than Task", "Incident extends Task, inheriting its fields and adding its own", "Incident and Task are unrelated tables", "Incident replaces Task entirely"], "correct": 1, "exp": "A child table extends its parent, inheriting the parent's structure while adding table-specific fields."}, {"q": "Where would a developer go to view a table's defined fields and their properties?", "opts": ["The Service Catalog", "The Dictionary (sys_dictionary) or System Definition > Tables", "The Banner Frame", "The Knowledge Base"], "correct": 1, "exp": "Dictionary entries (viewable via System Definition > Tables) define every field's properties for a table."}, {"q": "What's a common exam trap involving table extension?", "opts": ["Believing reporting is impossible across extended tables", "Assuming each child table needs every common field manually redefined", "Believing Business Rules can't run on extended tables", "Believing extension makes tables slower"], "correct": 1, "exp": "A frequent error is forgetting that common fields/logic only need to be defined once on the parent table."}, {"q": "What's the relationship between sys_id and a record's displayed Number (e.g., INC0010023)?", "opts": ["They're the same value shown differently", "sys_id is the internal unique key; Number is a separate, human-readable identifier", "Number is internal; sys_id is shown to users", "Records don't have both simultaneously"], "correct": 1, "exp": "sys_id and Number serve different purposes — one is the internal key, the other a friendly display identifier."}, {"q": "What type of field would 'Short description' on Incident most likely be?", "opts": ["Integer", "String", "Boolean", "Reference"], "correct": 1, "exp": "Short description is free text, making it a String field."}, {"q": "An admin needs a dropdown for Priority with fixed labeled options. What field type fits?", "opts": ["String", "Choice", "Journal", "HTML"], "correct": 1, "exp": "Choice fields provide a predefined dropdown of labeled options, ideal for something like Priority."}, {"q": "What's distinct about a Journal field compared to a String field on the same form?", "opts": ["Journal fields can be overwritten freely; String cannot", "Journal entries are append-only and preserved permanently, unlike editable String fields", "String fields support rich text; Journal does not", "There is no real difference"], "correct": 1, "exp": "Journal fields preserve a permanent history of entries, while String field values can simply be overwritten."}, {"q": "Why does a Reference field show a person's name instead of a long sys_id string on the form?", "opts": ["The sys_id is never actually stored", "The system displays a friendly display value while storing the sys_id internally", "Names are stored directly instead of sys_id", "Reference fields don't support sys_user"], "correct": 1, "exp": "Reference fields store the sys_id but render a human-friendly value for display purposes."}, {"q": "Why might Date/Time values appear different for users in different countries viewing the same record?", "opts": ["Records duplicate data per country", "The stored value (often UTC) is converted for display based on each viewer's time zone setting", "Date/Time fields are randomly generated", "Different countries use different databases"], "correct": 1, "exp": "Date/Time display is adjusted per viewer's personal time zone, even though the underlying stored value is consistent."}, {"q": "What does unchecking the 'Active' field on a User record actually do?", "opts": ["Deletes the user record permanently", "Prevents login while preserving the record and its history", "Grants temporary admin access", "Removes them from all groups automatically"], "correct": 1, "exp": "Deactivating preserves history for audit purposes while blocking login — it's not deletion."}, {"q": "What's the hierarchy order from broadest to most specific in the Service Catalog?", "opts": ["Item → Category → Catalog", "Catalog → Category → Item", "Category → Item → Catalog", "Item → Catalog → Category"], "correct": 1, "exp": "Catalog is the broadest container, holding Categories, which hold individual Items."}, {"q": "What gets created if a user orders 2 different Catalog Items in one cart?", "opts": ["Two separate REQs", "One REQ with two RITMs", "Two RITMs with no REQ", "One RITM with no REQ"], "correct": 1, "exp": "Ordering multiple items together generates one overall REQ containing one RITM per item."}, {"q": "What's the primary purpose of an Order Guide?", "opts": ["Restricting catalog access by role", "Bundling multiple catalog items into a single guided multi-item request", "Creating Knowledge Articles", "Tracking SLA breaches"], "correct": 1, "exp": "Order Guides streamline ordering multiple related items together, like an onboarding bundle."}, {"q": "How does a Record Producer differ from a standard Catalog Item?", "opts": ["Record Producers always cost more", "Record Producers create a record directly in a target table, skipping REQ/RITM, unlike standard items", "Record Producers can't be customized", "There is no functional difference"], "correct": 1, "exp": "Standard Catalog Items generate REQ/RITM; Record Producers create a record directly in the target table instead."}, {"q": "What stage comes right before 'Published' in the Knowledge Article lifecycle?", "opts": ["Retired", "Draft", "Review", "Deleted"], "correct": 2, "exp": "Review (approval) is the stage immediately before an article becomes Published."}, {"q": "Why is it problematic to allow agents to self-publish Knowledge Articles without any review?", "opts": ["It's not actually problematic at all", "Unreviewed or inaccurate content could reach end users without quality control", "Self-publishing is technically impossible in ServiceNow", "Review only matters for HR articles"], "correct": 1, "exp": "Approval steps exist to maintain content quality and prevent inaccurate information from reaching end users."}, {"q": "In Flow Designer, what's the difference between a Trigger and an Action?", "opts": ["They are identical concepts", "A Trigger starts the flow; Actions are the individual steps performed once it's running", "Actions start the flow; Triggers are the steps", "Triggers only exist for scheduled flows"], "correct": 1, "exp": "The Trigger initiates a flow's execution; Actions are the specific steps the flow then performs."}, {"q": "Why might a developer extract shared logic into a Subflow rather than rebuilding it in each flow?", "opts": ["Subflows are required by ServiceNow for all flows", "To avoid maintaining duplicate logic in multiple places, improving maintainability", "Subflows execute outside the platform", "Subflows replace the need for Triggers"], "correct": 1, "exp": "Subflows centralize reusable logic so it's built and maintained once, not duplicated across multiple flows."}, {"q": "Which Action would update an existing record's field as part of a flow?", "opts": ["Create Record", "Update Record", "Send Notification", "Ask for Approval"], "correct": 1, "exp": "Update Record is the Action used to modify an existing record's data within a flow."}, {"q": "What chart type would best display a cross-tabulation of incidents by both Category AND Priority simultaneously?", "opts": ["Pie chart", "Line chart", "Pivot table", "Gauge"], "correct": 2, "exp": "Pivot tables are designed for cross-tabulating two dimensions in a single grid."}, {"q": "A trend report showing SLA compliance rate over the last 12 months would most naturally use what kind of tool?", "opts": ["A standard current-snapshot Report only", "Performance Analytics, designed for historical trend tracking", "A Knowledge Article", "An Order Guide"], "correct": 1, "exp": "Performance Analytics is specifically built for tracking indicators historically over time, unlike standard current-snapshot reports."}, {"q": "What's the relationship between a Dashboard and individual Reports?", "opts": ["A Dashboard is a single Report renamed", "A Dashboard combines multiple Reports/widgets into one consolidated view", "Reports can only exist inside Dashboards, never standalone", "Dashboards replace the need for charts"], "correct": 1, "exp": "Dashboards aggregate multiple individual Reports/widgets for a consolidated view."}, {"q": "What's an Indicator in Performance Analytics terms?", "opts": ["A type of ACL", "A specific metric tracked historically over time", "A field on the Catalog table", "A type of Notification"], "correct": 1, "exp": "An Indicator is the specific metric PA tracks and records snapshots of over time."}, {"q": "What's the function of the Import Set staging table during a data import?", "opts": ["It's the permanent home for imported data", "It temporarily holds raw imported data exactly as received, before transformation", "It stores ACL rules", "It generates Notifications automatically"], "correct": 1, "exp": "Import Sets are a temporary staging layer holding unmodified raw data before transformation."}, {"q": "Can a Transform Map include scripted logic beyond simple direct field mapping?", "opts": ["No, only direct 1:1 field mapping is possible", "Yes, Transform Maps can include scripts for more complex transformation logic", "Scripts can only be added to Data Sources, not Transform Maps", "Transform Maps cannot reference other tables"], "correct": 1, "exp": "Transform Maps support scripted field mapping for logic beyond simple direct mapping, like reference lookups."}, {"q": "What defines where import data originates from — file upload, FTP, or JDBC connection?", "opts": ["The Transform Map", "The Data Source", "The Import Set", "The Target Table"], "correct": 1, "exp": "A Data Source specifically defines the origin/connection type for incoming import data."}, {"q": "What's the very first step in the Update Set workflow when starting new configuration work?", "opts": ["Commit the Update Set immediately", "Set the relevant Update Set as your Current/active one before making changes", "Back out the previous Update Set", "Delete the Dictionary entry"], "correct": 1, "exp": "Configuration changes are only automatically captured once the correct Update Set is set as Current."}, {"q": "What does marking an Update Set 'Complete' signal?", "opts": ["The changes have been permanently deleted", "The Update Set is ready to be retrieved/exported to a target instance", "The Update Set will auto-commit itself", "Nothing — Complete has no functional effect"], "correct": 1, "exp": "Marking Complete indicates development is finished and the Update Set is ready to move toward the target instance."}, {"q": "Why should Preview always happen before Commit?", "opts": ["Preview is purely cosmetic and has no real value", "Preview surfaces potential conflicts with existing customizations before any changes are actually applied", "Preview deletes conflicting customizations automatically", "Preview and Commit are the same action"], "correct": 1, "exp": "Preview is the safe, non-destructive check that should always precede the actual application of changes via Commit."}, {"q": "If a Commit introduces a bug, what's the appropriate corrective action?", "opts": ["Permanently delete the Production instance", "Use Back Out to reverse the specific Update Set's changes", "Ignore it until the next major release", "Manually rebuild the entire instance from scratch"], "correct": 1, "exp": "Back Out is designed specifically to reverse a previously committed Update Set's changes cleanly."}, {"q": "Should Update Sets be used to migrate actual business records, like real customer Incidents, between instances?", "opts": ["Yes, that's their main use case", "No — they're for configuration/customization metadata, not transactional business data", "Only for Incident records specifically", "Only with admin override enabled"], "correct": 1, "exp": "Update Sets exist for moving configuration metadata; moving real transactional data is a different process (e.g., data export/import)."}, {"q": "What does CRUD stand for in the context of access control?", "opts": ["Create, Retrieve, Use, Delete", "Create, Read, Update, Delete", "Compile, Run, Update, Deploy", "Capture, Retrieve, Undo, Drop"], "correct": 1, "exp": "CRUD = Create, Read, Update, Delete — the four operations ACLs typically govern."}, {"q": "If three separate ACLs apply to the same Write operation and a user passes two but fails one, what's the result?", "opts": ["Access is granted since most ACLs passed", "Access is denied — all applicable ACLs must pass", "The system picks randomly", "Only the first ACL checked matters"], "correct": 1, "exp": "ACL evaluation requires passing every single applicable rule; failing even one blocks the operation."}, {"q": "A field-level Read ACL on 'Salary' requires the hr_admin role. A manager without that role views the record. What do they see for that field?", "opts": ["The full salary value", "The field is hidden/blank for them since they fail the field-level Read ACL", "An error message crashing the form", "Full edit access regardless"], "correct": 1, "exp": "Failing a field-level Read ACL typically results in that specific field being hidden or blank for that user."}, {"q": "What's the purpose of combining a role requirement with a scripted condition in a single ACL?", "opts": ["It's not possible to combine them", "To allow more precise, conditional access control beyond just role membership", "To disable the ACL entirely", "To bypass all other ACLs automatically"], "correct": 1, "exp": "ACLs can combine static role checks with dynamic scripted conditions for more granular access control."}, {"q": "What initiates a Notification typically?", "opts": ["A user manually composing an email each time", "A matching Event or record condition configured on the Notification record", "A Knowledge Article being viewed", "An Order Guide being created"], "correct": 1, "exp": "Notifications are configured to fire automatically based on matching events or record conditions."}, {"q": "Can a single Event trigger multiple different Notifications?", "opts": ["No, one Event can only ever trigger one Notification", "Yes, multiple Notifications can be configured to respond to the same Event", "Events and Notifications are unrelated concepts", "Only Catalog-related events can trigger multiple Notifications"], "correct": 1, "exp": "A single Event can be the trigger condition for several different configured Notifications simultaneously."}, {"q": "What's an SLA primarily used to track?", "opts": ["Knowledge Article popularity", "Time-based service commitments, such as resolving a Priority 1 incident within 4 hours", "Catalog item pricing", "ACL conflicts"], "correct": 1, "exp": "SLAs track time commitments tied to service expectations, like resolution deadlines based on priority."}, {"q": "Why might an SLA pause rather than continue counting down?", "opts": ["SLAs never pause under any circumstance", "Conditions like 'Awaiting Customer' can be configured to pause the SLA clock", "Pausing only happens on weekends automatically", "Only Priority 5 SLAs can pause"], "correct": 1, "exp": "SLAs can be configured with pause conditions, such as waiting on customer response, to fairly reflect actual working time."}, {"q": "What's the difference between Assignment Group and Assigned To fields?", "opts": ["They always have the same value", "Assignment Group identifies the responsible team; Assigned To identifies the specific individual", "Assigned To is always set before Assignment Group", "Assignment Group can only be a single person"], "correct": 1, "exp": "Assignment Group represents the team responsible; Assigned To narrows it down to a specific individual handling the task."}, {"q": "What does the CMDB (Configuration Management Database) primarily track?", "opts": ["Knowledge Articles and their approval status", "An organization's IT assets/services (CIs) and the relationships between them", "Notification templates", "Update Set history"], "correct": 1, "exp": "The CMDB tracks Configuration Items and their interrelationships across the IT environment."}, {"q": "Why would an Incident be linked to a specific Configuration Item (CI)?", "opts": ["To automatically delete the CI", "To enable impact analysis of which asset/service is affected", "To bypass the need for an Assignment Group", "To hide the Incident from search results"], "correct": 1, "exp": "Linking to a CI helps support staff understand the scope/impact of an issue on specific assets or services."}, {"q": "Is the Self-Service Portal the same interface that agents use to actively work and resolve tickets?", "opts": ["Yes, they are identical", "No — agents typically use a separate agent-facing interface distinct from the end-user portal", "The Self-Service Portal is only for admins", "There is no agent-facing interface in ServiceNow"], "correct": 1, "exp": "The Self-Service Portal serves end users; agents typically work from a separate, more feature-rich agent interface."}, {"q": "What can end users typically do in the Self-Service Portal?", "opts": ["Configure ACLs", "Order catalog items, search Knowledge Articles, and check their ticket status", "Write Business Rules", "Manage Update Sets"], "correct": 1, "exp": "The portal is designed for end-user self-service tasks like ordering items, searching knowledge, and checking ticket status."}, {"q": "What does it mean that ServiceNow's UI is rendered dynamically from metadata (dictionary, ACLs, UI policies)?", "opts": ["Forms must be manually coded for every change", "Changing configuration like field properties immediately reflects in the UI without custom development", "The UI never changes once deployed", "Metadata only affects reports, not forms"], "correct": 1, "exp": "Because the Glide engine reads metadata to render the UI, configuration changes reflect immediately without needing custom code."}];
+let userAnswers = new Array(QUESTIONS.length).fill(null);
+let currentQ = 0;
+
+function getScores(){ try{ return JSON.parse(localStorage.getItem('csa_mocktest_scores') || '{}'); }catch(e){ return {}; } }
+function saveScore(pct, correctCount){
+  const scores = getScores();
+  const key = 'test'+TEST_NUM;
+  if(!scores[key] || scores[key].score < pct){
+    scores[key] = {score: pct, correct: correctCount, total: QUESTIONS.length, date: new Date().toLocaleDateString()};
+    localStorage.setItem('csa_mocktest_scores', JSON.stringify(scores));
+  }
+}
+function showBestScore(){
+  const scores = getScores();
+  const key = 'test'+TEST_NUM;
+  const note = document.getElementById('bestScoreNote');
+  if(scores[key]){
+    note.textContent = `Your best score so far: ${scores[key].correct}/${scores[key].total} (${scores[key].score}%) on ${scores[key].date}`;
+  }
+}
+showBestScore();
+
+function startTest(){
+  document.getElementById('mt-intro').style.display = 'none';
+  document.getElementById('mt-test').style.display = 'block';
+  buildJumpGrid();
+  renderQuestion();
+}
+
+function buildJumpGrid(){
+  const grid = document.getElementById('mtJumpGrid');
+  grid.innerHTML = QUESTIONS.map((q,i)=>`<button class="mt-jump" id="jump-${i}" onclick="goToQuestion(${i})">${i+1}</button>`).join('');
+}
+
+function goToQuestion(i){ currentQ = i; renderQuestion(); }
+
+function renderQuestion(){
+  const q = QUESTIONS[currentQ];
+  const card = document.getElementById('mtQuestionCard');
+  const selected = userAnswers[currentQ];
+  card.innerHTML = `
+    <div class="mt-qnum">Question ${currentQ+1} of ${QUESTIONS.length}</div>
+    <div class="mt-qtext">${q.q}</div>
+    ${q.opts.map((opt,i)=>`
+      <label class="mt-opt ${selected===i?'selected':''}" onclick="selectAnswer(${i})">
+        <input type="radio" name="mtopt" ${selected===i?'checked':''} readonly>
+        <span>${opt}</span>
+      </label>`).join('')}
+  `;
+  document.getElementById('mtNextBtn').style.display = currentQ === QUESTIONS.length-1 ? 'none' : 'inline-block';
+  document.getElementById('mtSubmitBtn').style.display = currentQ === QUESTIONS.length-1 ? 'inline-block' : 'none';
+  updateProgressUI();
+  document.querySelectorAll('.mt-jump').forEach((el,i)=>el.classList.toggle('current', i===currentQ));
+}
+
+function selectAnswer(i){
+  userAnswers[currentQ] = i;
+  document.getElementById('jump-'+currentQ).classList.add('answered');
+  renderQuestion();
+}
+
+function mtNext(){ if(currentQ < QUESTIONS.length-1){ currentQ++; renderQuestion(); } }
+function mtPrev(){ if(currentQ > 0){ currentQ--; renderQuestion(); } }
+
+function updateProgressUI(){
+  const answered = userAnswers.filter(a=>a!==null).length;
+  document.getElementById('mtCounter').textContent = `${answered} / ${QUESTIONS.length} answered`;
+  document.getElementById('mtProgressFill').style.width = `${(answered/QUESTIONS.length)*100}%`;
+}
+
+function submitTest(){
+  const unanswered = userAnswers.filter(a=>a===null).length;
+  if(unanswered > 0){
+    if(!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+  }
+  let correctCount = 0;
+  QUESTIONS.forEach((q,i)=>{ if(userAnswers[i]===q.correct) correctCount++; });
+  const pct = Math.round((correctCount/QUESTIONS.length)*100);
+  saveScore(pct, correctCount);
+
+  document.getElementById('mt-test').style.display = 'none';
+  const resultsEl = document.getElementById('mt-results');
+  resultsEl.style.display = 'block';
+
+  let reviewHtml = QUESTIONS.map((q,i)=>{
+    const userAns = userAnswers[i];
+    const isCorrect = userAns === q.correct;
+    return `
+      <div class="mt-qcard mt-review-item">
+        <div class="mt-qnum" style="color:${isCorrect ? 'var(--success)' : 'var(--danger)'};">Question ${i+1} — ${isCorrect ? 'Correct' : 'Incorrect'}</div>
+        <div class="mt-qtext">${q.q}</div>
+        ${q.opts.map((opt,oi)=>{
+          let cls = 'mt-opt';
+          if(oi === q.correct) cls += ' correct-answer';
+          else if(oi === userAns) cls += ' wrong-answer';
+          return `<div class="${cls}"><span>${opt}</span></div>`;
+        }).join('')}
+        <div class="mt-explanation shown"><strong>Explanation:</strong> ${q.exp}</div>
+      </div>`;
+  }).join('');
+
+  resultsEl.innerHTML = `
+    <div class="mt-results">
+      <div class="mt-score-circle">
+        <div class="pct">${pct}%</div>
+        <div class="lbl">${correctCount} / ${QUESTIONS.length} correct</div>
+      </div>
+      <div class="mt-result-breakdown">
+        <div class="mt-result-stat"><b style="color:var(--success);">${correctCount}</b>Correct</div>
+        <div class="mt-result-stat"><b style="color:var(--danger);">${QUESTIONS.length-correctCount}</b>Incorrect</div>
+        <div class="mt-result-stat"><b>${pct}%</b>Score</div>
+      </div>
+      <button class="mt-startbtn" onclick="location.reload()">Retake Test</button>
+    </div>
+    <h3 style="margin-top:30px;">Full Review</h3>
+    ${reviewHtml}
+  `;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>

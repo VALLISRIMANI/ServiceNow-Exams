@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapid Revision & Exam Guide | ServiceNow CSA Study Portal</title>
+<style>
+:root{
+  --bg:#FFFFFF; --bg-secondary:#F5F5F5; --card:#FFFFFF; --text:#1F2937; --text-muted:#6B7280;
+  --accent:#2C5282; --accent-soft:#EBF2FA; --border:#E5E7EB; --success:#2F855A; --danger:#C53030; --warning:#9C6F19;
+  --shadow:0 1px 3px rgba(0,0,0,0.06); --shadow-hover:0 4px 12px rgba(0,0,0,0.08);
+  --radius:10px; --sidebar-w:268px;
+}
+[data-theme="dark"]{
+  --bg:#0F1419; --bg-secondary:#161D26; --card:#1B232D; --text:#E5E9EE; --text-muted:#8B97A5;
+  --accent:#6FA8DC; --accent-soft:#1B2C3D; --border:#2B3641; --success:#48BB78; --danger:#F56565; --warning:#ECC94B;
+  --shadow:0 1px 3px rgba(0,0,0,0.3); --shadow-hover:0 4px 16px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.65; font-size:16px; transition:background .2s,color .2s;
+}
+h1,h2,h3,h4{font-family:Georgia,'Times New Roman',serif; font-weight:600; color:var(--text); line-height:1.3;}
+a{color:var(--accent); text-decoration:none;}
+a:hover{text-decoration:underline;}
+::selection{background:var(--accent-soft);}
+
+/* Layout */
+.app{display:flex; min-height:100vh;}
+.sidebar{
+  width:var(--sidebar-w); flex-shrink:0; background:var(--bg-secondary); border-right:1px solid var(--border);
+  position:fixed; top:0; left:0; height:100vh; overflow-y:auto; padding:20px 0 40px; z-index:100;
+  transition:transform .25s ease;
+}
+.sidebar-brand{padding:0 20px 16px; border-bottom:1px solid var(--border); margin-bottom:14px;}
+.sidebar-brand .logo-row{display:flex; align-items:center; gap:10px;}
+.sidebar-brand .badge{width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Georgia,serif;font-size:15px;flex-shrink:0;}
+.sidebar-brand h1{font-size:16px; margin:0; line-height:1.25;}
+.sidebar-brand p{font-size:12px; color:var(--text-muted); margin:2px 0 0;}
+.nav-group{margin-bottom:6px;}
+.nav-group-label{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); padding:14px 20px 6px; font-weight:600;}
+.nav-link{
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 20px; font-size:14px;
+  color:var(--text); border-left:3px solid transparent; cursor:pointer;
+}
+.nav-link:hover{background:var(--accent-soft); text-decoration:none;}
+.nav-link.active{border-left-color:var(--accent); background:var(--accent-soft); font-weight:600; color:var(--accent);}
+.nav-link .check{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;}
+.nav-link .check.done{background:var(--success);border-color:var(--success);}
+.module-sub-list{display:none; flex-direction:column;}
+.module-sub-list.open{display:flex;}
+.module-sub-list a{padding:6px 20px 6px 40px; font-size:12.5px; color:var(--text-muted); display:block;}
+.module-sub-list a:hover{color:var(--accent);}
+
+.main{margin-left:var(--sidebar-w); flex:1; min-width:0;}
+.topbar{
+  position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:14px; padding:12px 28px;
+}
+.search-wrap{flex:1; max-width:480px; position:relative;}
+.search-wrap input{
+  width:100%; padding:9px 14px 9px 34px; border-radius:8px; border:1px solid var(--border); background:var(--bg-secondary);
+  color:var(--text); font-size:14px;
+}
+.search-wrap input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+.search-icon{position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px;}
+.search-results{
+  position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--card); border:1px solid var(--border);
+  border-radius:8px; box-shadow:var(--shadow-hover); max-height:360px; overflow-y:auto; display:none; z-index:60;
+}
+.search-results.open{display:block;}
+.search-result-item{padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px;}
+.search-result-item:last-child{border-bottom:none;}
+.search-result-item:hover{background:var(--accent-soft);}
+.search-result-item .srt{font-weight:600; display:block; margin-bottom:2px;}
+.search-result-item .srm{color:var(--text-muted); display:block;}
+.topbar-right{display:flex; align-items:center; gap:10px; margin-left:auto;}
+.icon-btn{
+  width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+}
+.icon-btn:hover{background:var(--accent-soft);}
+.menu-toggle{display:none;}
+.progress-pill{
+  font-size:12.5px; padding:7px 12px; border-radius:20px; background:var(--accent-soft); color:var(--accent); font-weight:600; white-space:nowrap;
+}
+
+.content{padding:32px 40px 80px; max-width:980px;}
+.page-header{margin-bottom:8px;}
+.page-header .eyebrow{font-size:12.5px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;}
+.page-header h1{font-size:30px; margin:0 0 6px;}
+.page-header .sub{color:var(--text-muted); font-size:15px; max-width:680px;}
+
+.module{margin-top:56px; padding-top:8px; border-top:1px solid var(--border);}
+.module:first-of-type{border-top:none; margin-top:36px;}
+.module-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+.module-num{font-family:Georgia,serif; font-size:14px; color:var(--accent); font-weight:700;}
+.module h2{font-size:23px; margin:0;}
+.mark-done-btn{
+  margin-left:auto; font-size:12px; padding:6px 12px; border-radius:7px; border:1px solid var(--border); background:var(--card);
+  color:var(--text-muted); cursor:pointer; font-weight:600;
+}
+.mark-done-btn.done{background:var(--success); color:#fff; border-color:var(--success);}
+
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; margin:18px 0; box-shadow:var(--shadow);}
+.card h3{font-size:17px; margin:0 0 10px;}
+.card h4{font-size:14.5px; margin:16px 0 6px;}
+.card p{margin:8px 0;}
+.card ul, .card ol{margin:8px 0; padding-left:22px;}
+.card li{margin:4px 0;}
+
+.example-box{
+  background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+.example-box strong{color:var(--accent);}
+.trick-box{
+  background:rgba(236,201,75,0.08); border-left:3px solid var(--warning); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .trick-box{background:rgba(236,201,75,0.06);}
+.trick-box strong{color:var(--warning);}
+.mistake-box{
+  background:rgba(197,48,48,0.06); border-left:3px solid var(--danger); border-radius:6px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+}
+[data-theme="dark"] .mistake-box{background:rgba(245,101,101,0.06);}
+.mistake-box strong{color:var(--danger);}
+
+table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--border);}
+th{background:var(--bg-secondary); font-weight:700; color:var(--text);}
+tr:hover{background:var(--bg-secondary);}
+
+.diagram{
+  background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; padding:22px;
+  margin:16px 0; font-family:'SF Mono',Consolas,monospace; font-size:13px; overflow-x:auto;
+}
+.diagram pre{margin:0; white-space:pre;}
+.flow-svg{display:block; margin:16px auto; max-width:100%;}
+
+.tag{display:inline-block; font-size:11px; padding:3px 9px; border-radius:12px; background:var(--accent-soft); color:var(--accent); font-weight:600; margin:2px 4px 2px 0;}
+
+.collapsible{border:1px solid var(--border); border-radius:8px; margin:12px 0; overflow:hidden;}
+.collapsible-head{
+  display:flex; justify-content:space-between; align-items:center; padding:12px 16px; cursor:pointer; background:var(--card); font-weight:600; font-size:14.5px;
+}
+.collapsible-head:hover{background:var(--bg-secondary);}
+.collapsible-head .arrow{transition:transform .2s; color:var(--text-muted); font-size:12px;}
+.collapsible.open .collapsible-head .arrow{transform:rotate(90deg);}
+.collapsible-body{display:none; padding:0 16px 16px; font-size:14.5px;}
+.collapsible.open .collapsible-body{display:block;}
+
+.exam-q{background:var(--bg-secondary); border-radius:8px; padding:14px 16px; margin:12px 0; font-size:14px;}
+.exam-q .q-label{font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; margin-bottom:4px;}
+.exam-q .q-answer{margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); color:var(--text-muted); font-size:13.5px;}
+
+.concept-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0;}
+@media (max-width:700px){.concept-grid{grid-template-columns:1fr;}}
+.concept-card{background:var(--card); border:1px solid var(--border); border-radius:8px; padding:16px;}
+.concept-card .cnum{font-size:11px; color:var(--accent); font-weight:700;}
+.concept-card h4{margin:4px 0 8px; font-size:15px;}
+.concept-card .clabel{font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-top:8px;}
+.concept-card .ctext{font-size:13.5px; margin:2px 0 0;}
+
+.bottom-nav{display:flex; justify-content:space-between; margin-top:48px; padding-top:24px; border-top:1px solid var(--border); gap:12px;}
+.bottom-nav a{
+  flex:1; padding:14px 18px; border:1px solid var(--border); border-radius:8px; font-size:14px; color:var(--text);
+  display:flex; flex-direction:column; gap:2px;
+}
+.bottom-nav a:hover{background:var(--accent-soft); text-decoration:none;}
+.bottom-nav .lbl{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;}
+.bottom-nav .next-link{text-align:right;}
+
+@media (max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0); box-shadow:4px 0 20px rgba(0,0,0,0.2);}
+  .main{margin-left:0;}
+  .menu-toggle{display:flex;}
+  .content{padding:24px 18px 60px;}
+  .concept-grid{grid-template-columns:1fr;}
+  .search-wrap{max-width:none;}
+  .progress-pill{display:none;}
+}
+.overlay{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90;}
+.overlay.open{display:block;}
+
+.rev-tabs{display:flex; gap:8px; margin:18px 0 24px; flex-wrap:wrap;}
+.rev-tab{padding:9px 16px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:13.5px; cursor:pointer; font-weight:600;}
+.rev-tab.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+.rev-panel{display:none;}
+.rev-panel.active{display:block;}
+.rev-list{margin:10px 0;}
+.rev-checkitem{display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); font-size:14.5px;}
+.rev-checkitem input{margin-top:3px;}
+.guide-step{display:flex; gap:16px; margin:18px 0; align-items:flex-start;}
+.guide-step .gnum{width:34px;height:34px;border-radius:50%;background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; font-family:Georgia,serif;}
+
+</style>
+</head>
+<body>
+<div class="app">
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-row">
+      <div class="badge">SN</div>
+      <div>
+        <h1>CSA Study Portal</h1>
+        <p>Certified System Administrator</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-group">
+    <a class="nav-link" href="index.html"><span>Dashboard</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Theory — 16 Modules</div>
+    <div id="module-nav-list"></div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Practice</div>
+    <a class="nav-link" href="flashcards.html"><span>Flashcards (150)</span></a>
+    <a class="nav-link" href="mocktest1.html"><span>Mock Test 1</span></a>
+    <a class="nav-link" href="mocktest2.html"><span>Mock Test 2</span></a>
+    <a class="nav-link" href="mocktest3.html"><span>Mock Test 3</span></a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-label">Revision</div>
+    <a class="nav-link" href="revision.html"><span>Rapid Revision & Exam Guide</span></a>
+  </div>
+</nav>
+<div class="main">
+  <div class="topbar">
+    <button class="icon-btn menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+    <div class="search-wrap" style="visibility:hidden;"></div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="eyebrow">Final Stretch</div>
+      <h1>Rapid Revision & Exam Success Guide</h1>
+      <p class="sub">Condensed revision sheets for every time budget, plus a practical strategy for your final week, final day, and exam morning.</p>
+    </div>
+
+    <div class="rev-tabs">
+      <button class="rev-tab active" onclick="showTab('oneday')">1-Day Sheet</button>
+      <button class="rev-tab" onclick="showTab('twohour')">2-Hour Sheet</button>
+      <button class="rev-tab" onclick="showTab('thirtymin')">30-Minute Sheet</button>
+      <button class="rev-tab" onclick="showTab('strategy')">Exam Success Guide</button>
+    </div>
+
+    <div class="rev-panel active" id="panel-oneday">
+      <div class="card">
+        <h3>1-Day Revision Sheet</h3>
+        <p>Use this if you have a full day before your exam. Spend roughly 45–60 minutes per block, with a 10-minute break between blocks.</p>
+        <div class="rev-list">
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 1 — Platform & Architecture:</strong> SaaS vs PaaS, multi-instance architecture, instance types (PDI, Dev, Test, Prod).</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 2 — UI Fundamentals:</strong> Application Navigator, Modules vs Applications, Favorites vs History, Lists vs Forms, Related Lists.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 3 — Users, Groups, Roles:</strong> Role inheritance, direct vs group-based role assignment, scenario questions.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 4 — Tables:</strong> Task table hierarchy (Incident/Problem/Change), parent vs child, dictionary basics.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 5 — Field Types:</strong> String, Integer, Choice, Reference, Boolean, Date/Time, Journal — definitions and examples.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 6 — Service Catalog & Knowledge:</strong> Catalog hierarchy, REQ/RITM/SCTASK, Order Guides vs Record Producers, KB article lifecycle.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 7 — Flow Designer & Automation:</strong> Triggers, Actions, Subflows; Notifications and Events.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 8 — Update Sets & ACLs:</strong> Capture → Preview → Commit → Back Out; CRUD and ACL AND-logic evaluation.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 9 — Reporting & Imports:</strong> Chart types, Reports vs Dashboards vs PA, Import Set → Transform Map → Target Table.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>Block 10 — Flashcards + 1 Mock Test:</strong> Run through all 150 flashcards once, then take one full Mock Test under timed conditions.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rev-panel" id="panel-twohour">
+      <div class="card">
+        <h3>2-Hour Revision Sheet</h3>
+        <p>Focused, high-yield review for the morning of or the night before your exam.</p>
+        <div class="rev-list">
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>(20 min)</strong> Skim the Top 60 Exam-Critical Concepts in Module 16 of the Theory Guide.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>(20 min)</strong> Review Update Sets: Capture → Preview → Commit → Back Out, and the "config not data" rule.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>(20 min)</strong> Review ACL AND-logic: all applicable ACLs must pass; table-level vs field-level distinctions.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>(20 min)</strong> Review Task table hierarchy and the benefit of table extension.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>(20 min)</strong> Review Service Catalog terms: Catalog/Category/Item, REQ/RITM/SCTASK, Order Guide vs Record Producer.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>(20 min)</strong> Run through Flashcards filtered to "Show only unknown" to target your weak spots.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rev-panel" id="panel-thirtymin">
+      <div class="card">
+        <h3>30-Minute Revision Sheet</h3>
+        <p>For right before you walk in. Just the highest-leverage reminders.</p>
+        <div class="rev-list">
+          <div class="rev-checkitem"><input type="checkbox"><span>ACLs use <strong>AND logic</strong> — all applicable ACLs must pass, not just one.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Update Sets move <strong>configuration</strong>, never transactional data. Preview ≠ Commit.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Incident, Problem, Change all extend <strong>Task</strong> — shared fields/logic live there.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span><strong>History</strong> = automatic recent records. <strong>Favorites</strong> = manual bookmarks.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Roles can come from <strong>direct assignment OR group membership</strong> — removing one source doesn't remove the other.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Ordering a Catalog Item creates <strong>REQ → RITM → SCTASK</strong>. A Record Producer skips this and writes directly to a target table.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Knowledge Articles: <strong>Draft → Review → Published → Retired</strong>. Only Published is visible to end users.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Reference fields display a friendly value but store a <strong>sys_id</strong> internally.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Journal fields are <strong>append-only</strong> — entries can't be edited or deleted.</span></div>
+          <div class="rev-checkitem"><input type="checkbox"><span>Import Sets are always a <strong>staging table</strong>, never the final destination.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rev-panel" id="panel-strategy">
+      <div class="card">
+        <h3>What to Study First</h3>
+        <p>Start with the foundational, highest-frequency topics before niche ones: Platform Overview, UI basics, Users/Groups/Roles, and the Task table hierarchy. These underpin nearly every scenario question elsewhere in the exam.</p>
+      </div>
+      <div class="card">
+        <h3>Last Week Strategy</h3>
+        <div class="guide-step"><div class="gnum">1</div><div>Complete all 16 theory modules at least once, marking each "complete" as you go to track progress.</div></div>
+        <div class="guide-step"><div class="gnum">2</div><div>Run through all 150 flashcards twice — once normally, once filtered to "Show only unknown."</div></div>
+        <div class="guide-step"><div class="gnum">3</div><div>Take Mock Test 1 under realistic timed conditions and review every explanation, even for questions you got right.</div></div>
+        <div class="guide-step"><div class="gnum">4</div><div>Identify your 2–3 weakest modules from mock test mistakes and re-read those theory sections.</div></div>
+        <div class="guide-step"><div class="gnum">5</div><div>Take Mock Tests 2 and 3 on different days, leaving at least a day between attempts to let review sink in.</div></div>
+      </div>
+      <div class="card">
+        <h3>Last Day Strategy</h3>
+        <ul>
+          <li>Don't cram new material — focus only on review and reinforcement.</li>
+          <li>Use the 2-Hour Revision Sheet above for a focused final pass.</li>
+          <li>Re-take your weakest-scoring Mock Test one more time to build confidence.</li>
+          <li>Get full sleep — recall performance drops significantly when sleep-deprived.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Common Mistakes to Avoid</h3>
+        <div class="mistake-box"><strong>Mistake:</strong> Memorizing definitions without understanding the underlying "why" — CSA scenario questions test application, not just recall.</div>
+        <div class="mistake-box"><strong>Mistake:</strong> Skipping the ACL AND-logic and Update Set Preview/Commit distinctions — these are among the most frequently tested traps.</div>
+        <div class="mistake-box"><strong>Mistake:</strong> Ignoring UI navigation terminology (Module vs Application, History vs Favorites) because it "seems too basic" — it's tested directly.</div>
+        <div class="mistake-box"><strong>Mistake:</strong> Not reviewing wrong answers' explanations after mock tests — the explanation is often where the real learning happens.</div>
+      </div>
+      <div class="card">
+        <h3>Time Management During the Real Exam</h3>
+        <ul>
+          <li>Skim through and answer every question you're confident about first.</li>
+          <li>Flag uncertain questions and return to them after a first full pass.</li>
+          <li>Don't dwell more than 60–90 seconds on any single question on your first pass.</li>
+          <li>For scenario questions, re-read carefully for qualifier words like "only," "always," or "never" — these often determine the correct answer.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <a href="mocktest3.html"><span class="lbl">Back to</span><span>Mock Test 3</span></a>
+      <a href="index.html" class="next-link"><span class="lbl">Return to</span><span>Dashboard →</span></a>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('csa_theme', t);
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(cur);
+}
+applyTheme(localStorage.getItem('csa_theme') || 'light');
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('open'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('open'); }
+
+const MODULE_TITLES = [
+  "Platform Overview","User Interface","Users, Groups & Roles","Tables & Databases",
+  "Forms & Lists","Dictionary & Fields","Service Catalog","Knowledge Management",
+  "Flow Designer","Reporting","Importing Data","Update Sets","Security (ACL)",
+  "Notifications","Performance Analytics Basics","Exam-Critical Concepts (Top 60)"
+];
+function getProgress(){ try{ return JSON.parse(localStorage.getItem('csa_progress_modules') || '{}'); }catch(e){ return {}; } }
+function buildModuleNav(){
+  const list = document.getElementById('module-nav-list');
+  const progress = getProgress();
+  let html = '';
+  MODULE_TITLES.forEach((title, i)=>{
+    const n = i+1;
+    const done = progress['m'+n] ? 'done' : '';
+    html += `<a class="nav-link" href="theory.html#module-${n}"><span>${n}. ${title}</span><span class="check ${done}"></span></a>`;
+  });
+  list.innerHTML = html;
+}
+buildModuleNav();
+
+function showTab(tab){
+  document.querySelectorAll('.rev-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.rev-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* Persist checkbox state per panel */
+function getChecklist(){ try{ return JSON.parse(localStorage.getItem('csa_revision_checklist') || '{}'); }catch(e){ return {}; } }
+function saveChecklist(c){ localStorage.setItem('csa_revision_checklist', JSON.stringify(c)); }
+window.addEventListener('DOMContentLoaded', function(){
+  const checklist = getChecklist();
+  document.querySelectorAll('.rev-checkitem input').forEach((cb, i)=>{
+    const key = 'item'+i;
+    cb.checked = !!checklist[key];
+    cb.addEventListener('change', function(){
+      const c = getChecklist();
+      c[key] = cb.checked;
+      saveChecklist(c);
+    });
+  });
+});
+</script>
+</body>
+</html>
