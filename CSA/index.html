@@ -243,6 +243,7 @@ tr:hover{background:var(--bg-secondary);}
     <a class="nav-link" href="mocktest1.html"><span>Mock Test 1</span></a>
     <a class="nav-link" href="mocktest2.html"><span>Mock Test 2</span></a>
     <a class="nav-link" href="mocktest3.html"><span>Mock Test 3</span></a>
+    <a class="nav-link" href="examprepperquestions.html"><span>ExamPrepper Questions (352)</span></a>
   </div>
   <div class="nav-group">
     <div class="nav-group-label">Revision</div>
@@ -303,6 +304,11 @@ tr:hover{background:var(--bg-secondary);}
         <span class="ptitle">Mock Test 3</span>
         <span class="pmeta">60 questions · instant scoring</span>
         <span class="pscore" id="mt3ScoreNote">Not attempted</span>
+      </a>
+      <a class="dash-practice-card" href="examprepperquestions.html">
+        <span class="ptitle">ExamPrepper Questions</span>
+        <span class="pmeta">352 questions · single & multi-select</span>
+        <span class="pscore" id="epScoreNote">Not attempted</span>
       </a>
     </div>
 
@@ -378,6 +384,14 @@ function renderDashboard(){
   });
   document.getElementById('statTestsDone').textContent = `${attempted}/3`;
   document.getElementById('statBestScore').textContent = best !== null ? `${best}%` : '—';
+
+  try{
+    const epScores = JSON.parse(localStorage.getItem('csa_examprepper_scores') || '{}');
+    const epEl = document.getElementById('epScoreNote');
+    if(epScores.best && epEl){
+      epEl.textContent = `Best: ${epScores.best.correct}/${epScores.best.total} (${epScores.best.score}%)`;
+    }
+  }catch(e){}
 
   const grid = document.getElementById('moduleGrid');
   grid.innerHTML = MODULE_TITLES.map((title,i)=>{
